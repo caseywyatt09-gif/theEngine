@@ -1357,7 +1357,7 @@ export default function App() {
         {onboardingStep === 4 && (
           // STEP 4: HYROX Stations - Strengths & Weaknesses
           <View style={styles.onboardingContent}>
-            <Text style={[styles.onboardingTitle, { marginTop: 10, fontSize: 24 }]}>Your HYROX Profile 💪</Text>
+            <Text style={[styles.onboardingTitle, { marginTop: 10, fontSize: 24 }]}>Your HYROX Profile (Subdir) 💪</Text>
             <Text style={styles.onboardingSubtitle}>Select your strengths & weaknesses to find complementary partners</Text>
 
             <ScrollView
