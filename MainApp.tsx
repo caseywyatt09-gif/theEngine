@@ -1477,7 +1477,7 @@ export default function App() {
                   style={[styles.modeChip, { backgroundColor: matchFilters.race ? Colors.race : 'transparent', borderWidth: 1, borderColor: Colors.race }]}
                   onPress={() => setMatchFilters(f => ({ ...f, race: !f.race }))}
                 >
-                  <Text style={[styles.modeChipText, { color: matchFilters.race ? 'white' : Colors.race, fontSize: 13 }]}>🏁 Race</Text>
+                  <Text style={[styles.modeChipText, { color: matchFilters.race ? 'white' : Colors.race, fontSize: 13 }]}>🏁 Race (Root)</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modeChip, { backgroundColor: matchFilters.fun ? Colors.fun : 'transparent', borderWidth: 1, borderColor: Colors.fun }]}
