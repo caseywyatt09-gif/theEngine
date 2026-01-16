@@ -1357,12 +1357,12 @@ export default function App() {
         {onboardingStep === 4 && (
           // STEP 4: HYROX Stations - Strengths & Weaknesses
           <View style={styles.onboardingContent}>
-            <Text style={[styles.onboardingTitle, { marginTop: 60, fontSize: 24 }]}>Your HYROX Profile 💪</Text>
+            <Text style={[styles.onboardingTitle, { marginTop: 10, fontSize: 24 }]}>Your HYROX Profile 💪</Text>
             <Text style={styles.onboardingSubtitle}>Select your strengths & weaknesses to find complementary partners</Text>
 
             <ScrollView
-              style={{ flex: 1, marginTop: 20 }}
-              contentContainerStyle={{ paddingBottom: 200 }}
+              style={{ flex: 1, marginTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 140 }}
               showsVerticalScrollIndicator={false}
             >
               {/* Strengths Section */}
@@ -1442,13 +1442,13 @@ export default function App() {
             </ScrollView>
 
             <TouchableOpacity
-              style={[styles.nextButton, { position: 'absolute', bottom: 100, left: 20, right: 20 }]}
+              style={[styles.nextButton, { position: 'absolute', bottom: 50, left: 20, right: 20 }]}
               onPress={() => { SoundEffects.playSuccess(); startFindingMatch(); }}
             >
               <Text style={styles.nextButtonText}>Find My Match ✨</Text>
             </TouchableOpacity>
 
-            <View style={[styles.progressDots, { position: 'absolute', bottom: 60, left: 0, right: 0 }]}>
+            <View style={[styles.progressDots, { position: 'absolute', bottom: 20, left: 0, right: 0 }]}>
               {[0, 1, 2, 3].map(i => (
                 <View key={i} style={[styles.dot, i === 3 && styles.dotActive]} />
               ))}
@@ -1561,79 +1561,45 @@ export default function App() {
                       />
                     )) || <Image source={currentAthlete.avatar} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />}
 
-                    {/* Photo navigation tap zones */}
-                    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', flexDirection: 'row', zIndex: 50 }}>
-                      <TouchableOpacity
-                        style={{ flex: 1 }}
-                        onPress={() => { SoundEffects.playTap(); setCardPhotoIndex(i => i > 0 ? i - 1 : (currentAthlete.photos?.length || 1) - 1); }}
-                        activeOpacity={1}
-                      />
-                      <TouchableOpacity
-                        style={{ flex: 1 }}
-                        onPress={() => { SoundEffects.playTap(); setCardPhotoIndex(i => i < (currentAthlete.photos?.length || 1) - 1 ? i + 1 : 0); }}
-                        activeOpacity={1}
-                      />
+
+                    {/* Gradient Overlay */}
+                    <LinearGradient colors={['transparent', 'transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+
+                    {/* Tap Zones for Photos */}
+                    <View style={{ flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 150 }}>
+                      <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.max(0, i - 1))} />
+                      <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.min((currentAthlete.photos?.length || 1) - 1, i + 1))} />
                     </View>
-
-                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)', '#000']} style={styles.cardGradient} />
-
-                    {/* LIKE OVERLAY */}
-                    <Animated.View style={{ position: 'absolute', top: 50, left: 40, zIndex: 1000, opacity: likeOpacity, transform: [{ rotate: '-30deg' }] }}>
-                      <Text style={{ borderWidth: 4, borderColor: Colors.fun, color: Colors.fun, fontSize: 32, fontWeight: '800', padding: 10, borderRadius: 10 }}>LIKE</Text>
-                    </Animated.View>
-
-                    {/* NOPE OVERLAY */}
-                    <Animated.View style={{ position: 'absolute', top: 50, right: 40, zIndex: 1000, opacity: nopeOpacity, transform: [{ rotate: '30deg' }] }}>
-                      <Text style={{ borderWidth: 4, borderColor: Colors.race, color: Colors.race, fontSize: 32, fontWeight: '800', padding: 10, borderRadius: 10 }}>NOPE</Text>
-                    </Animated.View>
-
-                    {/* Event Badge (if attending) */}
-                    {EVENTS.find(e => e.attendees.some(a => a.id === currentAthlete.id)) && (
-                      <View style={styles.matchEventBadge}>
-                        <Ionicons name="ticket" size={14} color="white" />
-                        <Text style={styles.matchEventText}>Going to {EVENTS.find(e => e.attendees.some(a => a.id === currentAthlete.id))?.name}</Text>
-                      </View>
-                    )}
 
                     <View style={[styles.modeBadge, { backgroundColor: currentAthlete.mode === 'race' ? Colors.race : Colors.fun }]}>
                       <Text style={styles.modeBadgeText}>{currentAthlete.mode === 'race' ? '🏁 RACE' : '🎉 FUN'}</Text>
                     </View>
+
                     <View style={styles.cardContent}>
                       <Text style={styles.athleteName}>{currentAthlete.name}, {currentAthlete.age}</Text>
                       <Text style={styles.locationText}><Ionicons name="location" size={12} color={Colors.textDim} /> {currentAthlete.location}</Text>
                       <Text style={styles.bioText}>{currentAthlete.bio}</Text>
-                      <View style={styles.tag}><Text style={styles.tagText}>{currentAthlete.vibeCheck}</Text></View>
-                      <View style={styles.actionButtons}>
-                        <TouchableOpacity style={styles.skipButton} onPress={() => {
-                          Animated.spring(position, { toValue: { x: -width - 100, y: 0 }, useNativeDriver: false }).start(() => {
-                            setCurrentIndex(i => i + 1);
-                            position.setValue({ x: 0, y: 0 });
-                          });
-                        }}>
-                          <Ionicons name="close" size={28} color={Colors.race} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.likeButton, { backgroundColor: activeColor }]} onPress={() => {
-                          Animated.spring(position, { toValue: { x: width + 100, y: 0 }, useNativeDriver: false }).start(() => {
-                            setCurrentIndex(i => i + 1);
-                            position.setValue({ x: 0, y: 0 });
-                          });
-                        }}>
-                          <Ionicons name="heart" size={32} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.skipButton}>
-                          <Ionicons name="star" size={24} color="#FFD700" />
-                        </TouchableOpacity>
+                      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                        <View style={styles.tag}><Text style={styles.tagText}>{currentAthlete.vibeCheck}</Text></View>
                       </View>
+                    </View>
+
+                    {/* Action Buttons Overlay */}
+                    <View style={{ position: 'absolute', bottom: 20, right: 20, flexDirection: 'row', gap: 16 }}>
+                      <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.race }} onPress={handleReject}>
+                        <Ionicons name="close" size={24} color={Colors.race} />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: activeColor, justifyContent: 'center', alignItems: 'center', shadowColor: activeColor, shadowOpacity: 0.5, shadowRadius: 10 }} onPress={handleLike}>
+                        <Ionicons name="heart" size={30} color="white" />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.fun }}>
+                        <Ionicons name="star" size={24} color={Colors.fun} />
+                      </TouchableOpacity>
                     </View>
                   </Animated.View>
 
-                  {/* Photo Thumbnails - Below Card */}
-                  <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    gap: 8,
-                    marginTop: 16,
-                  }}>
+                  {/* Photo Thumbnails (Outside Card) */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 24 }}>
                     {currentAthlete.photos?.map((photo, idx) => (
                       <TouchableOpacity
                         key={idx}
@@ -1659,895 +1625,903 @@ export default function App() {
                   </View>
                 </View>
               ) : (
-                <View style={[styles.centered, { flex: 1 }]}>
+                <View style={[styles.centered, { flex: 1, minHeight: 400 }]}>
                   <Text style={{ color: Colors.textDim }}>No athletes found with current filters.</Text>
                 </View>
-              )
-            ) : (
-              // Grid View
-              <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                  {filteredAthletes.map(athlete => (
-                    <TouchableOpacity
-                      key={athlete.id}
-                      style={{ width: '31%', aspectRatio: 0.75, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface }}
-                      onPress={() => setSelectedProfileId(athlete.id)}
-                    >
-                      <Image source={athlete.avatar} style={{ width: '100%', height: '100%' }} />
-                      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%' }} />
-                      <View style={{ position: 'absolute', bottom: 8, left: 8 }}>
-                        <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>{athlete.name.split(' ')[0]}, {athlete.age}</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 6 }}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Ionicons name="location" size={10} color={Colors.textDim} />
-                            <Text style={{ color: Colors.textDim, fontSize: 10, marginLeft: 2 }}>{athlete.distance} mi</Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View style={{ position: 'absolute', top: 6, right: 6, backgroundColor: athlete.mode === 'race' ? Colors.race : Colors.fun, paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 9, fontWeight: '700', color: athlete.mode === 'fun' ? 'black' : 'white' }}>{athlete.mode === 'race' ? 'RACE' : 'FUN'}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
                 </View>
-              </ScrollView>
-            )}
-
+        ) : (
+          <View style={[styles.centered, { flex: 1, minHeight: 400 }]}>
+            <Text style={{ color: Colors.textDim }}>No athletes found with current filters.</Text>
           </View>
-        );
-      case 'warroom':
-        return (
-          <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
-            <Text style={styles.sectionTitle}>🏋️ Training Dashboard</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}><Text style={styles.statValue}>12</Text><Text style={styles.statLabel}>Workouts</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>48km</Text><Text style={styles.statLabel}>Distance</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>5:12</Text><Text style={styles.statLabel}>Avg Pace</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>85</Text><Text style={styles.statLabel}>Score</Text></View>
-            </View>
-          </ScrollView>
-        );
-
-      case 'feed':
-        return (
-          <View style={{ flex: 1 }}>
-            {/* Feed Mode Toggle - Photos vs Pulse (Sticky) */}
-            <View style={[styles.feedToggle, { margin: 16, marginBottom: 0 }]}>
-              <TouchableOpacity
-                style={[styles.feedToggleBtn, feedMode === 'photos' && { backgroundColor: activeColor }]}
-                onPress={() => setFeedMode('photos')}
-              >
-                <Ionicons name="images" size={18} color={feedMode === 'photos' ? 'white' : Colors.textDim} />
-                <Text style={[styles.feedToggleText, feedMode === 'photos' && { color: 'white' }]}>Photos</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.feedToggleBtn, feedMode === 'pulse' && { backgroundColor: activeColor }]}
-                onPress={() => setFeedMode('pulse')}
-              >
-                <Ionicons name="chatbubbles" size={18} color={feedMode === 'pulse' ? 'white' : Colors.textDim} />
-                <Text style={[styles.feedToggleText, feedMode === 'pulse' && { color: 'white' }]}>Pulse</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.feedToggleBtn, feedMode === 'forum' && { backgroundColor: activeColor }]}
-                onPress={() => setFeedMode('forum')}
-              >
-                <MaterialCommunityIcons name="forum-outline" size={18} color={feedMode === 'forum' ? 'white' : Colors.textDim} />
-                <Text style={[styles.feedToggleText, feedMode === 'forum' && { color: 'white' }]}>Locker Room</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
-
-              {feedMode === 'photos' ? (
-                <>
-                  {/* Stories Row */}
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
-                    <TouchableOpacity
-                      style={styles.storyBubble}
-                      onPress={() => { setNewPostHasImage(true); setShowComposeModal(true); }}
-                    >
-                      <View style={[styles.storyRing, { backgroundColor: Colors.surface }]}>
-                        <View style={styles.storyAvatar}>
-                          <Ionicons name="add" size={24} color={activeColor} />
-                        </View>
-                      </View>
-                      <Text style={styles.storyName}>Add</Text>
-                    </TouchableOpacity>
-                    {ATHLETES.map((athlete) => (
-                      <TouchableOpacity key={athlete.id} style={styles.storyBubble}>
-                        <LinearGradient colors={[activeColor, '#FFD700']} style={styles.storyRing}>
-                          <Image source={athlete.avatar} style={styles.storyAvatarImg} />
-                        </LinearGradient>
-                        <Text style={styles.storyName}>{athlete.name.split(' ')[0]}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-
-                  {/* Compose Prompt for Photos */}
-                  <TouchableOpacity
-                    style={[styles.composePulse, { marginBottom: 24 }]}
-                    onPress={() => { setNewPostHasImage(true); setShowComposeModal(true); }}
-                  >
-                    <View style={styles.composeAvatar}><Ionicons name="person" size={20} color="white" /></View>
-                    <Text style={styles.composePlaceholder}>Post a workout photo...</Text>
-                    <Ionicons name="images" size={20} color={activeColor} />
-                  </TouchableOpacity>
-
-                  {/* Photo Posts */}
-                  {feedPosts.map(post => (
-                    <View key={post.id} style={styles.feedPost}>
-                      <View style={styles.postHeader}>
-                        <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
-                          <Image source={post.athlete.avatar} style={styles.postAvatarImg} />
-                        </TouchableOpacity>
-                        <View style={{ flex: 1 }}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
-                              <Text style={styles.postAuthor}>{post.athlete.name}</Text>
-                            </TouchableOpacity>
-                            <Ionicons name="checkmark-circle" size={14} color={activeColor} />
-                          </View>
-                          <Text style={styles.postTime}>{post.timeAgo} · {post.athlete.location}</Text>
-                        </View>
-                        <TouchableOpacity>
-                          <Ionicons name="ellipsis-horizontal" size={20} color={Colors.textDim} />
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={styles.postContent}>{post.content}</Text>
-                      {post.image && (
-                        <TouchableOpacity activeOpacity={0.9} onPress={() => setSelectedProfileId(post.athlete.id)} style={styles.postImageContainer}>
-                          <Image source={post.image} style={styles.postImage} resizeMode="cover" />
-                        </TouchableOpacity>
-                      )}
-                      {post.workout && (
-                        <View style={styles.workoutCard}>
-                          <View style={styles.workoutHeader}>
-                            <Ionicons name={post.workout.type === 'Running' ? 'walk' : 'water'} size={20} color={activeColor} />
-                            <Text style={styles.workoutType}>{post.workout.title || post.workout.type}</Text>
-                          </View>
-                          <View style={styles.workoutStats}>
-                            <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.distance}</Text><Text style={styles.workoutLabel}>Distance</Text></View>
-                            <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.duration}</Text><Text style={styles.workoutLabel}>Time</Text></View>
-                            <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.pace}</Text><Text style={styles.workoutLabel}>Pace</Text></View>
-                          </View>
-                        </View>
-                      )}
-                      {post.achievement && (
-                        <View style={styles.achievementBadge}>
-                          <Text style={styles.achievementIcon}>{post.achievement.icon}</Text>
-                          <Text style={styles.achievementTitle}>{post.achievement.title}</Text>
-                        </View>
-                      )}
-                      {post.event && (
-                        <View style={styles.eventMini}>
-                          <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: activeColor, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>📅</Text></View>
-                          <View>
-                            <Text style={styles.eventMiniName}>{post.event.name}</Text>
-                            <Text style={styles.eventMiniDate}>{post.event.date}</Text>
-                          </View>
-                        </View>
-                      )}
-                      <View style={styles.postActions}>
-                        <TouchableOpacity style={styles.postAction}><Ionicons name="heart-outline" size={22} color={Colors.textDim} /><Text style={styles.postActionText}>{post.likes}</Text></TouchableOpacity>
-                        <TouchableOpacity style={styles.postAction}><Ionicons name="chatbubble-outline" size={20} color={Colors.textDim} /><Text style={styles.postActionText}>{post.comments}</Text></TouchableOpacity>
-                        <TouchableOpacity style={styles.postAction}><Ionicons name="share-outline" size={22} color={Colors.textDim} /></TouchableOpacity>
-                        <TouchableOpacity style={[styles.postAction, { marginLeft: 'auto' }]}><Ionicons name="bookmark-outline" size={22} color={Colors.textDim} /></TouchableOpacity>
-                      </View>
-                    </View>
-                  ))}
-                </>
-              ) : feedMode === 'pulse' ? (
-                <>
-                  {/* Compose Pulse */}
-                  <View style={styles.composePulse}>
-                    <View style={styles.composeAvatar}><Ionicons name="person" size={20} color="white" /></View>
-                    <TouchableOpacity style={{ flex: 1 }} onPress={() => setShowComposeModal(true)}>
-                      <Text style={styles.composePlaceholder}>What's on your mind?</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.composeBtn, { backgroundColor: activeColor }]} onPress={() => setShowComposeModal(true)}>
-                      <Text style={styles.composeBtnText}>Post</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {pulsePosts.map(post => (
-                    <View key={post.id} style={styles.pulsePost}>
-                      <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
-                        <Image source={post.athlete.avatar} style={styles.pulseAvatar} />
-                      </TouchableOpacity>
-                      <View style={{ flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
-                            <Text style={styles.pulseName}>{post.athlete.name}</Text>
-                          </TouchableOpacity>
-                          <Ionicons name="checkmark-circle" size={12} color={activeColor} />
-                          <Text style={styles.pulseTime}>· {post.timeAgo}</Text>
-                        </View>
-                        <Text style={styles.pulseContent}>{post.content}</Text>
-                        {post.image && (
-                          <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)} activeOpacity={0.9} style={{ marginBottom: 12, borderRadius: 12, overflow: 'hidden' }}>
-                            <Image source={post.image} style={{ width: '100%', height: 200, backgroundColor: '#2a2a35' }} resizeMode="cover" />
-                          </TouchableOpacity>
-                        )}
-                        <View style={styles.pulseActions}>
-                          <TouchableOpacity style={styles.pulseAction}>
-                            <Ionicons name="heart-outline" size={18} color={Colors.textDim} />
-                            <Text style={styles.pulseActionText}>{post.likes}</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={styles.pulseAction}>
-                            <Ionicons name="chatbubble-outline" size={16} color={Colors.textDim} />
-                            <Text style={styles.pulseActionText}>{post.comments}</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={styles.pulseAction}>
-                            <Ionicons name="repeat" size={18} color={Colors.textDim} />
-                            <Text style={styles.pulseActionText}>{post.reposts}</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={styles.pulseAction}>
-                            <Ionicons name="share-outline" size={18} color={Colors.textDim} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
-                </>
-              ) : (
-                <>
-                  {/* Forum Header / Tags */}
-                  <View style={{ marginBottom: 16 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                      {['All', 'Strategy', 'Gear', 'Matchmaking', 'Wins', 'Nutrition'].map((tag) => (
-                        <TouchableOpacity
-                          key={tag}
-                          onPress={() => setForumFilter(tag)}
-                          style={{
-                            backgroundColor: forumFilter === tag ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
-                            paddingHorizontal: 16,
-                            paddingVertical: 8,
-                            borderRadius: 20
-                          }}
-                        >
-                          <Text style={{ color: forumFilter === tag ? 'white' : Colors.textDim, fontWeight: '600', fontSize: 13 }}>{tag}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </View>
-
-                  {/* Forum Threads */}
-                  {FORUM_THREADS
-                    .filter(thread => forumFilter === 'All' || thread.tag === forumFilter)
-                    .map((thread) => (
-                      <TouchableOpacity
-                        key={thread.id}
-                        onPress={() => {
-                          Alert.alert('Thread Clicked', `Thread ID: ${thread.id}`);
-                          setSelectedThread(thread.id);
-                        }}
-                        style={{
-                          backgroundColor: 'rgba(255,255,255,0.05)',
-                          borderRadius: 16,
-                          padding: 16,
-                          marginBottom: 12,
-                          borderWidth: 1,
-                          borderColor: 'rgba(255,255,255,0.05)'
-                        }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <View style={{ flex: 1, marginRight: 12 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                              <View style={{ backgroundColor: 'rgba(0,206,209,0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginRight: 8 }}>
-                                <Text style={{ color: Colors.fun, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{thread.tag}</Text>
-                              </View>
-                              <Text style={{ color: Colors.textDim, fontSize: 12 }}>@{thread.author} • {thread.time}</Text>
-                            </View>
-                            <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', lineHeight: 22, marginBottom: 4 }}>{thread.title}</Text>
-
-                            <View style={{ flexDirection: 'row', marginTop: 8, gap: 16 }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <MaterialCommunityIcons name="comment-outline" size={16} color={Colors.textDim} />
-                                <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>{thread.answers} comments</Text>
-                              </View>
-                            </View>
-                          </View>
-
-                          <View style={{ alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 12, paddingVertical: 6, width: 40 }}>
-                            <Ionicons name="caret-up" size={18} color={activeColor} />
-                            <Text style={{ color: 'white', fontWeight: '700', fontSize: 12, marginVertical: 1 }}>{thread.upvotes}</Text>
-                            <Ionicons name="caret-down" size={18} color={Colors.textDim} />
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-
-                  <TouchableOpacity style={{ alignItems: 'center', padding: 20 }}>
-                    <Text style={{ color: Colors.textDim }}>View all topics...</Text>
-                  </TouchableOpacity>
-
-                  <View style={{ height: 60 }} />
-                </>
-              )}
-            </ScrollView>
-          </View>
-        );
-      case 'market':
-        if (marketView === 'all_lives') {
-          const filteredLives = MARKET_LIVE_STREAMS.filter(stream =>
-            liveCategory === 'all' || stream.category === liveCategory
-          );
-
-          return (
-            <View style={styles.container}>
-              {/* Header */}
-              <View style={{ padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <TouchableOpacity onPress={() => setMarketView('home')} style={{ padding: 4 }}>
-                  <Ionicons name="arrow-back" size={24} color="white" />
-                </TouchableOpacity>
-                <Text style={styles.sectionTitle}>🔥 Live Auctions</Text>
-              </View>
-
-              {/* Categories */}
-              <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                  {MARKET_CATEGORIES.map(cat => (
-                    <TouchableOpacity
-                      key={cat.id}
-                      style={[styles.tag, { backgroundColor: liveCategory === cat.id ? activeColor : Colors.surface, borderWidth: 0 }]}
-                      onPress={() => setLiveCategory(cat.id)}
-                    >
-                      <Text style={[styles.tagText, { color: liveCategory === cat.id ? 'white' : Colors.textDim }]}>{cat.label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-
-              {/* Grid */}
-              <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                  {filteredLives.map(stream => (
-                    <TouchableOpacity key={stream.id} style={{ width: '48%', aspectRatio: 0.7, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface, marginBottom: 16 }}>
-                      <Image source={stream.image} style={{ width: '100%', height: '100%' }} />
-                      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120 }} />
-
-                      <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                        <Text style={{ color: 'white', fontSize: 10, fontWeight: '800' }}>LIVE</Text>
-                      </View>
-
-                      <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, flexDirection: 'row', alignItems: 'center' }}>
-                        <Ionicons name="eye" size={10} color="white" style={{ marginRight: 4 }} />
-                        <Text style={{ color: 'white', fontSize: 10 }}>{(stream.viewers / 1000).toFixed(1)}k</Text>
-                      </View>
-
-                      <View style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
-                        <Text style={{ color: 'white', fontWeight: '700', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{stream.title}</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={stream.avatar} style={{ width: 16, height: 16, borderRadius: 8, marginRight: 6 }} />
-                          <Text style={{ color: Colors.textDim, fontSize: 12 }} numberOfLines={1}>{stream.host}</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-          );
-        }
-
-        // Market Home View
-        const filteredProducts = MARKET_PRODUCTS.filter(p => {
-          const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-          const matchesSearch = p.name.toLowerCase().includes(marketSearch.toLowerCase());
-          const matchesCondition = p.condition === (showUsed ? 'Used' : 'New');
-          return matchesCategory && matchesSearch && matchesCondition;
-        });
-
-        return (
-          <View style={styles.container}>
-            {/* Market Header */}
-            <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
-              <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 12, paddingHorizontal: 12, height: 44 }}>
-                  <Ionicons name="search" size={20} color={Colors.textDim} />
-                  <TextInput
-                    style={{ flex: 1, color: 'white', marginLeft: 8, fontSize: 16 }}
-                    placeholder="Search gear, tickets..."
-                    placeholderTextColor={Colors.textDim}
-                    value={marketSearch}
-                    onChangeText={setMarketSearch}
-                  />
-                </View>
-                <TouchableOpacity
-                  style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' }}
-                  onPress={() => setShowScanner(true)}
-                >
-                  <Ionicons name="camera" size={24} color={Colors.fun} />
-                </TouchableOpacity>
-              </View>
-
-              {/* Categories */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                {MARKET_CATEGORIES.map(cat => (
-                  <TouchableOpacity
-                    key={cat.id}
-                    style={[styles.tag, { backgroundColor: selectedCategory === cat.id ? activeColor : Colors.surface, borderWidth: 0 }]}
-                    onPress={() => setSelectedCategory(cat.id)}
-                  >
-                    <Text style={[styles.tagText, { color: selectedCategory === cat.id ? 'white' : Colors.textDim }]}>{cat.label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-
-            <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
-              {/* Live Auctions Section */}
-              <View style={{ marginBottom: 24 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 }}>
-                  <Text style={styles.sectionTitle}>🔥 Live Auctions</Text>
-                  <TouchableOpacity onPress={() => setMarketView('all_lives')}><Text style={{ color: Colors.fun }}>See All</Text></TouchableOpacity>
-                </View>
-
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
-                  {MARKET_LIVE_STREAMS.slice(0, 3).map(stream => (
-                    <TouchableOpacity key={stream.id} style={{ width: 140, height: 200, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface }}>
-                      <Image source={stream.image} style={{ width: '100%', height: '100%' }} />
-                      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 }} />
-
-                      <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                        <Text style={{ color: 'white', fontSize: 10, fontWeight: '800' }}>LIVE</Text>
-                      </View>
-
-                      <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, flexDirection: 'row', alignItems: 'center' }}>
-                        <Ionicons name="eye" size={10} color="white" style={{ marginRight: 4 }} />
-                        <Text style={{ color: 'white', fontSize: 10 }}>{(stream.viewers / 1000).toFixed(1)}k</Text>
-                      </View>
-
-                      <View style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
-                        <Text style={{ color: 'white', fontWeight: '700', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{stream.title}</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={stream.avatar} style={{ width: 16, height: 16, borderRadius: 8, marginRight: 6 }} />
-                          <Text style={{ color: Colors.textDim, fontSize: 12 }}>{stream.host}</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-
-              {/* Products Section */}
-              <View style={{ paddingHorizontal: 16 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <Text style={styles.sectionTitle}>Top Picks</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 20, padding: 4 }}>
-                    <TouchableOpacity
-                      style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: !showUsed ? 'rgba(255,255,255,0.1)' : 'transparent' }}
-                      onPress={() => setShowUsed(false)}
-                    >
-                      <Text style={{ color: !showUsed ? 'white' : Colors.textDim, fontSize: 12, fontWeight: '600' }}>New</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: showUsed ? 'rgba(255,255,255,0.1)' : 'transparent' }}
-                      onPress={() => setShowUsed(true)}
-                    >
-                      <Text style={{ color: showUsed ? 'white' : Colors.textDim, fontSize: 12, fontWeight: '600' }}>Used</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                  {filteredProducts.map(product => (
-                    <TouchableOpacity key={product.id} style={{ width: '48%', backgroundColor: Colors.surface, borderRadius: 16, overflow: 'hidden', marginBottom: 16 }}>
-                      <View style={{ height: 150, backgroundColor: '#fff' }}>
-                        <Image source={product.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                        {product.condition === 'Used' && (
-                          <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 }}>
-                            <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>USED</Text>
-                          </View>
-                        )}
-                      </View>
-
-                      <View style={{ padding: 12 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                          <Text style={{ color: Colors.textDim, fontSize: 10, textTransform: 'uppercase' }}>{product.category}</Text>
-                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Ionicons name="star" size={10} color="#FFD700" />
-                            <Text style={{ color: 'white', fontSize: 10, marginLeft: 2 }}>{product.rating}</Text>
-                          </View>
-                        </View>
-
-                        <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{product.name}</Text>
-                        <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>${product.price}</Text>
-
-                        {product.prime && (
-                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-                            <Ionicons name="checkmark-circle" size={12} color={Colors.fun} />
-                            <Text style={{ color: Colors.fun, fontSize: 10, marginLeft: 4, fontWeight: '700' }}>PRIME</Text>
-                          </View>
-                        )}
-                        <Text style={{ color: Colors.textDim, fontSize: 10, marginTop: 4 }}>Sold by {product.seller}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </ScrollView>
-
-            {/* Simulated AI Scanner Modal */}
-            <Modal visible={showScanner} animationType="slide" transparent>
-              <View style={{ flex: 1, backgroundColor: 'black' }}>
-                <SafeAreaView style={{ flex: 1 }}>
-                  {/* Camera Header */}
-                  <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
-                    <TouchableOpacity onPress={() => setShowScanner(false)}>
-                      <Ionicons name="close" size={28} color="white" />
-                    </TouchableOpacity>
-                    <Text style={{ color: 'white', fontWeight: '700', fontSize: 16 }}>AI Product Scanner</Text>
-                    <Ionicons name="flash-off" size={24} color="white" />
-                  </View>
-
-                  {/* Camera Viewfinder (Simulated) */}
-                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    {/* Background Camera Feed Simulation */}
-                    <Image
-                      source={require('./assets/images/market_nike.png')}
-                      style={{ position: 'absolute', width: '80%', height: '40%', opacity: 0.5 }}
-                      resizeMode="contain"
-                    />
-                    <Text style={{ position: 'absolute', color: 'rgba(255,255,255,0.3)', top: '20%' }}>Simulated Camera Feed</Text>
-
-                    {/* Scanning Frame */}
-                    <View style={{ width: 300, height: 300, borderWidth: 2, borderColor: isScanning ? Colors.fun : 'white', borderRadius: 24, justifyContent: 'center', alignItems: 'center' }}>
-                      {isScanning && (
-                        <Animated.View style={{
-                          width: '100%',
-                          height: 2,
-                          backgroundColor: Colors.fun,
-                          shadowColor: Colors.fun,
-                          shadowOpacity: 1,
-                          shadowRadius: 10,
-                          top: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 290] })
-                        }} />
-                      )}
-                      {!isScanning && !scanResult && <Text style={{ color: 'white', fontWeight: '600' }}>Align product in frame</Text>}
-                    </View>
-
-                    {/* HUD Overlay */}
-                    {isScanning && (
-                      <View style={{ position: 'absolute', bottom: 150, padding: 16, backgroundColor: 'rgba(0,0,0,0.8)', borderRadius: 12 }}>
-                        <Text style={{ color: Colors.fun, fontWeight: '700' }}>Analyzing object...</Text>
-                        <Text style={{ color: 'white', fontSize: 12 }}>Identifying features...</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {/* Camera Controls / Result */}
-                  <View style={{ padding: 32, alignItems: 'center' }}>
-                    {!scanResult ? (
-                      <TouchableOpacity
-                        style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 6, borderColor: 'white', justifyContent: 'center', alignItems: 'center' }}
-                        onPress={() => {
-                          setIsScanning(true);
-                          SoundEffects.playBeep();
-
-                          // Simulate scanning process
-                          Animated.loop(
-                            Animated.sequence([
-                              Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: false }),
-                              Animated.timing(pulseAnim, { toValue: 0, duration: 1000, useNativeDriver: false })
-                            ])
-                          ).start();
-
-                          setTimeout(() => {
-                            setIsScanning(false);
-                            SoundEffects.playSuccess();
-                            setScanResult(MARKET_PRODUCTS[0]); // Find Nike Metcon result
-                          }, 3000);
-                        }}
-                      >
-                        <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'white' }} />
-                      </TouchableOpacity>
-                    ) : (
-                      // Result Card
-                      <View style={{ width: '100%', backgroundColor: Colors.surface, padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-                        <Image source={scanResult.image} style={{ width: 60, height: 60, borderRadius: 8, backgroundColor: 'white' }} resizeMode="contain" />
-                        <View style={{ flex: 1 }}>
-                          <Text style={{ color: Colors.fun, fontSize: 12, fontWeight: '700' }}>MATCH FOUND!</Text>
-                          <Text style={{ color: 'white', fontWeight: '700', fontSize: 16 }}>{scanResult.name}</Text>
-                          <Text style={{ color: Colors.textDim, fontSize: 14 }}>${scanResult.price} · {scanResult.seller}</Text>
-                        </View>
-                        <TouchableOpacity
-                          style={{ backgroundColor: Colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 }}
-                          onPress={() => { setShowScanner(false); setScanResult(null); }}
-                        >
-                          <Text style={{ color: 'white', fontWeight: '700' }}>View</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                </SafeAreaView>
-              </View>
-            </Modal>
-          </View>
-        );
-      case 'profile':
-        return (
-          <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
-            {/* 1. Header Section */}
-            <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 24 }}>
-              <View style={styles.avatarCircle}>
-                <MaterialCommunityIcons name="account" size={60} color={Colors.textDim} />
-                <View style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  backgroundColor: selectedGoal === 'race' ? Colors.race : Colors.fun,
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 3,
-                  borderColor: Colors.background
-                }}>
-                  <MaterialCommunityIcons
-                    name={selectedGoal === 'race' ? "trophy-variant-outline" : "party-popper"}
-                    size={18}
-                    color="white"
-                  />
-                </View>
-              </View>
-              <Text style={styles.profileName}>Guest Athlete</Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                  <MaterialCommunityIcons name={selectedGender === 'male' ? "gender-male" : selectedGender === 'female' ? "gender-female" : "gender-male-female"} size={14} color={Colors.textDim} />
-                  <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>{selectedGender ? selectedGender.charAt(0).toUpperCase() + selectedGender.slice(1) : 'Not Set'}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                  <Ionicons name="location-outline" size={14} color={Colors.textDim} />
-                  <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>New York, NY</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* 1.5 Growth Hack: Trophy Case */}
-            <View style={{ marginBottom: 24, paddingHorizontal: 16 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <Text style={styles.sectionTitle}>🏆 Badges</Text>
-                <TouchableOpacity onPress={() => {
-                  // Growth Hack: Simulate Share
-                  if (!unlockedBadges.includes('hype')) {
-                    SoundEffects.playSuccess();
-                    setUnlockedBadges(prev => [...prev, 'hype']);
-                    alert("🔥 HYPE BADGE UNLOCKED! Thanks for sharing!");
-                  }
-                }}>
-                  <Text style={{ color: Colors.fun, fontWeight: '700', fontSize: 13 }}>Share & Earn</Text>
-                </TouchableOpacity>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
-                {BADGES.map(badge => {
-                  const isUnlocked = unlockedBadges.includes(badge.id);
-                  return (
-                    <View key={badge.id} style={{
-                      alignItems: 'center',
-                      backgroundColor: isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
-                      padding: 12,
-                      borderRadius: 16,
-                      minWidth: 100,
-                      borderWidth: 1,
-                      borderColor: isUnlocked ? 'rgba(255,255,255,0.2)' : 'transparent'
-                    }}>
-                      <View style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        backgroundColor: isUnlocked ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.05)',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 8,
-                        opacity: isUnlocked ? 1 : 0.3
-                      }}>
-                        <MaterialCommunityIcons name={badge.icon as any} size={24} color={isUnlocked ? badge.color : 'white'} />
-                      </View>
-                      <Text style={{ color: isUnlocked ? 'white' : Colors.textDim, fontWeight: '700', fontSize: 13 }}>{badge.label}</Text>
-                      <Text style={{ color: Colors.textDim, fontSize: 10, marginTop: 2 }}>{badge.description}</Text>
-                      {!isUnlocked && (
-                        <View style={{ position: 'absolute', top: 8, right: 8 }}>
-                          <Ionicons name="lock-closed" size={10} color={Colors.textDim} />
-                        </View>
-                      )}
-                    </View>
-                  );
-                })}
-              </ScrollView>
-            </View>
-
-            {/* 2. Stats Grid (Placeholder) */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 32 }}>
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>12</Text>
-                <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Workouts</Text>
-              </View>
-              <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>4</Text>
-                <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Events</Text>
-              </View>
-              <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>88</Text>
-                <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Followers</Text>
-              </View>
-            </View>
-
-            {/* 3. Helper: Section Header */}
-            <View style={{ paddingHorizontal: 16 }}>
-
-              {/* HYROX DNA */}
-              <View style={{ marginBottom: 32 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <Text style={styles.sectionTitle}>🧬 Your HYROX DNA</Text>
-                  <TouchableOpacity>
-                    <MaterialCommunityIcons name="pencil-outline" size={20} color={Colors.textDim} />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Strengths */}
-                {selectedHyroxStrengths.length > 0 && (
-                  <View style={{ marginBottom: 16 }}>
-                    <Text style={{ color: '#4ADE80', fontSize: 14, fontWeight: '700', marginBottom: 12, textTransform: 'uppercase' }}>Strengths</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                      {HYROX_STATIONS.filter(s => selectedHyroxStrengths.includes(s.id)).map(station => (
-                        <View key={station.id} style={[styles.hyroxChipSimple, { backgroundColor: '#4ADE80', borderColor: '#4ADE80' }]}>
-                          <MaterialCommunityIcons name={station.icon as any} size={18} color="black" />
-                          <Text style={[styles.hyroxChipLabel, { color: 'black' }]}>{station.label}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Weaknesses */}
-                {selectedHyroxWeaknesses.length > 0 && (
-                  <View>
-                    <Text style={{ color: '#FB7185', fontSize: 14, fontWeight: '700', marginBottom: 12, textTransform: 'uppercase' }}>Needs Work</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                      {HYROX_STATIONS.filter(s => selectedHyroxWeaknesses.includes(s.id)).map(station => (
-                        <View key={station.id} style={[styles.hyroxChipSimple, { backgroundColor: '#FB7185', borderColor: '#FB7185' }]}>
-                          <MaterialCommunityIcons name={station.icon as any} size={18} color="black" />
-                          <Text style={[styles.hyroxChipLabel, { color: 'black' }]}>{station.label}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {selectedHyroxStrengths.length === 0 && selectedHyroxWeaknesses.length === 0 && (
-                  <Text style={{ color: Colors.textDim, fontStyle: 'italic' }}>No HYROX data set yet. Edit profile to add.</Text>
-                )}
-              </View>
-
-              {/* Vibe Check */}
-              <View style={{ marginBottom: 32 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <Text style={styles.sectionTitle}>✨ Your Vibe</Text>
-                </View>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                  {VIBES.filter(v => selectedVibes.includes(v.id)).map(vibe => (
-                    <View key={vibe.id} style={styles.activityChip}>
-                      <Text style={styles.activityChipText}>{vibe.label}</Text>
-                    </View>
-                  ))}
-                  {selectedVibes.length === 0 && (
-                    <Text style={{ color: Colors.textDim, fontStyle: 'italic' }}>No vibes selected.</Text>
-                  )}
-                </View>
-              </View>
-
-              {/* Settings / Actions */}
-              <TouchableOpacity style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                padding: 16,
-                borderRadius: 16,
-                marginBottom: 16
-              }}>
-                <Ionicons name="settings-outline" size={20} color="white" />
-                <Text style={{ color: 'white', fontWeight: '700', marginLeft: 8 }}>Settings</Text>
-              </TouchableOpacity>
-
-              <Text style={{ color: Colors.textDim, textAlign: 'center', fontSize: 12 }}>Version 1.0.0 (Beta)</Text>
-
-            </View>
-          </ScrollView>
-        );
+        )
     }
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>{activeTab.toUpperCase()}</Text>
-        </View>
-      </View>
-
-      {/* Content */}
-      <View style={styles.content}>{renderContent()}</View>
-
-      {/* Tab Bar */}
-      <View style={styles.tabBar}>
-        {TABS.map(tab => (
-          <TouchableOpacity key={tab.name} style={styles.tabItem} onPress={() => setActiveTab(tab.name)}>
-            <Ionicons name={tab.icon} size={24} color={activeTab === tab.name ? activeColor : Colors.textDim} />
-            <Text style={[styles.tabLabel, { color: activeTab === tab.name ? activeColor : Colors.textDim }]}>{tab.label}</Text>
+            </ScrollView >
+        ) : (
+    // Grid View
+    <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        {filteredAthletes.map(athlete => (
+          <TouchableOpacity
+            key={athlete.id}
+            style={{ width: '31%', aspectRatio: 0.75, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface }}
+            onPress={() => setSelectedProfileId(athlete.id)}
+          >
+            <Image source={athlete.avatar} style={{ width: '100%', height: '100%' }} />
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%' }} />
+            <View style={{ position: 'absolute', bottom: 8, left: 8 }}>
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>{athlete.name.split(' ')[0]}, {athlete.age}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 6 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="location" size={10} color={Colors.textDim} />
+                  <Text style={{ color: Colors.textDim, fontSize: 10, marginLeft: 2 }}>{athlete.distance} mi</Text>
+                </View>
+              </View>
+            </View>
+            <View style={{ position: 'absolute', top: 6, right: 6, backgroundColor: athlete.mode === 'race' ? Colors.race : Colors.fun, paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6 }}>
+              <Text style={{ fontSize: 9, fontWeight: '700', color: athlete.mode === 'fun' ? 'black' : 'white' }}>{athlete.mode === 'race' ? 'RACE' : 'FUN'}</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
+    </ScrollView>
+  )
+}
 
-      {/* Forum Thread Modal - Root Level */}
-      {selectedThread && (
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.95)' }}>
-          <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <TouchableOpacity onPress={() => setSelectedThread(null)}>
-                <Ionicons name="arrow-back" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>Discussion</Text>
-              <TouchableOpacity>
-                <Ionicons name="ellipsis-horizontal" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
+          </View >
+        );
+      case 'warroom':
+return (
+  <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
+    <Text style={styles.sectionTitle}>🏋️ Training Dashboard</Text>
+    <View style={styles.statsGrid}>
+      <View style={styles.statCard}><Text style={styles.statValue}>12</Text><Text style={styles.statLabel}>Workouts</Text></View>
+      <View style={styles.statCard}><Text style={styles.statValue}>48km</Text><Text style={styles.statLabel}>Distance</Text></View>
+      <View style={styles.statCard}><Text style={styles.statValue}>5:12</Text><Text style={styles.statLabel}>Avg Pace</Text></View>
+      <View style={styles.statCard}><Text style={styles.statValue}>85</Text><Text style={styles.statLabel}>Score</Text></View>
+    </View>
+  </ScrollView>
+);
 
-            <ScrollView style={{ flex: 1, padding: 16 }}>
-              {/* Original Post */}
-              <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, marginBottom: 20 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                  <View style={{ backgroundColor: 'rgba(0,206,209,0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginRight: 8 }}>
-                    <Text style={{ color: Colors.fun, fontSize: 10, fontWeight: '800' }}>GEAR</Text>
-                  </View>
-                  <Text style={{ color: Colors.textDim, fontSize: 12 }}>@Sarahfit • 2h ago</Text>
+      case 'feed':
+return (
+  <View style={{ flex: 1 }}>
+    {/* Feed Mode Toggle - Photos vs Pulse (Sticky) */}
+    <View style={[styles.feedToggle, { margin: 16, marginBottom: 0 }]}>
+      <TouchableOpacity
+        style={[styles.feedToggleBtn, feedMode === 'photos' && { backgroundColor: activeColor }]}
+        onPress={() => setFeedMode('photos')}
+      >
+        <Ionicons name="images" size={18} color={feedMode === 'photos' ? 'white' : Colors.textDim} />
+        <Text style={[styles.feedToggleText, feedMode === 'photos' && { color: 'white' }]}>Photos</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.feedToggleBtn, feedMode === 'pulse' && { backgroundColor: activeColor }]}
+        onPress={() => setFeedMode('pulse')}
+      >
+        <Ionicons name="chatbubbles" size={18} color={feedMode === 'pulse' ? 'white' : Colors.textDim} />
+        <Text style={[styles.feedToggleText, feedMode === 'pulse' && { color: 'white' }]}>Pulse</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.feedToggleBtn, feedMode === 'forum' && { backgroundColor: activeColor }]}
+        onPress={() => setFeedMode('forum')}
+      >
+        <MaterialCommunityIcons name="forum-outline" size={18} color={feedMode === 'forum' ? 'white' : Colors.textDim} />
+        <Text style={[styles.feedToggleText, feedMode === 'forum' && { color: 'white' }]}>Locker Room</Text>
+      </TouchableOpacity>
+    </View>
+
+    <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
+
+      {feedMode === 'photos' ? (
+        <>
+          {/* Stories Row */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
+            <TouchableOpacity
+              style={styles.storyBubble}
+              onPress={() => { setNewPostHasImage(true); setShowComposeModal(true); }}
+            >
+              <View style={[styles.storyRing, { backgroundColor: Colors.surface }]}>
+                <View style={styles.storyAvatar}>
+                  <Ionicons name="add" size={24} color={activeColor} />
                 </View>
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Best shoes for Hyrox Manchester? 👟</Text>
-                <Text style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 20 }}>
-                  Looking for recommendations for Hyrox Manchester in 3 weeks. I usually wear Nike Metcons but wondering if I should switch to something lighter for the running. What do you all think?
-                </Text>
               </View>
+              <Text style={styles.storyName}>Add</Text>
+            </TouchableOpacity>
+            {ATHLETES.map((athlete) => (
+              <TouchableOpacity key={athlete.id} style={styles.storyBubble}>
+                <LinearGradient colors={[activeColor, '#FFD700']} style={styles.storyRing}>
+                  <Image source={athlete.avatar} style={styles.storyAvatarImg} />
+                </LinearGradient>
+                <Text style={styles.storyName}>{athlete.name.split(' ')[0]}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-              {/* Comments */}
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 16 }}>34 Comments</Text>
+          {/* Compose Prompt for Photos */}
+          <TouchableOpacity
+            style={[styles.composePulse, { marginBottom: 24 }]}
+            onPress={() => { setNewPostHasImage(true); setShowComposeModal(true); }}
+          >
+            <View style={styles.composeAvatar}><Ionicons name="person" size={20} color="white" /></View>
+            <Text style={styles.composePlaceholder}>Post a workout photo...</Text>
+            <Ionicons name="images" size={20} color={activeColor} />
+          </TouchableOpacity>
 
-              {[
-                { author: 'CoachMike', time: '1h ago', content: 'I swear by On Cloudmonsters for HYROX. Great cushioning for the runs and stable enough for the stations.' },
-                { author: 'FitJess', time: '45m ago', content: 'Agree with CoachMike! Also the Hoka Speedgoats are 🔥' },
-                { author: 'BeastMode', time: '30m ago', content: 'Metcons are fine if you\'re used to them. Don\'t change shoes close to race day!' }
-              ].map((comment, i) => (
-                <View key={i} style={{ flexDirection: 'row', marginBottom: 20 }}>
-                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', marginRight: 12 }} />
-                  <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                      <Text style={{ color: 'white', fontWeight: '700', marginRight: 8 }}>@{comment.author}</Text>
-                      <Text style={{ color: Colors.textDim, fontSize: 12 }}>{comment.time}</Text>
-                    </View>
-                    <Text style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 20 }}>{comment.content}</Text>
-                    <View style={{ flexDirection: 'row', marginTop: 8, gap: 16 }}>
-                      <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Ionicons name="heart-outline" size={16} color={Colors.textDim} />
-                        <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>12</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity>
-                        <Text style={{ color: Colors.textDim, fontSize: 13 }}>Reply</Text>
-                      </TouchableOpacity>
-                    </View>
+          {/* Photo Posts */}
+          {feedPosts.map(post => (
+            <View key={post.id} style={styles.feedPost}>
+              <View style={styles.postHeader}>
+                <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
+                  <Image source={post.athlete.avatar} style={styles.postAvatarImg} />
+                </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
+                      <Text style={styles.postAuthor}>{post.athlete.name}</Text>
+                    </TouchableOpacity>
+                    <Ionicons name="checkmark-circle" size={14} color={activeColor} />
+                  </View>
+                  <Text style={styles.postTime}>{post.timeAgo} · {post.athlete.location}</Text>
+                </View>
+                <TouchableOpacity>
+                  <Ionicons name="ellipsis-horizontal" size={20} color={Colors.textDim} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.postContent}>{post.content}</Text>
+              {post.image && (
+                <TouchableOpacity activeOpacity={0.9} onPress={() => setSelectedProfileId(post.athlete.id)} style={styles.postImageContainer}>
+                  <Image source={post.image} style={styles.postImage} resizeMode="cover" />
+                </TouchableOpacity>
+              )}
+              {post.workout && (
+                <View style={styles.workoutCard}>
+                  <View style={styles.workoutHeader}>
+                    <Ionicons name={post.workout.type === 'Running' ? 'walk' : 'water'} size={20} color={activeColor} />
+                    <Text style={styles.workoutType}>{post.workout.title || post.workout.type}</Text>
+                  </View>
+                  <View style={styles.workoutStats}>
+                    <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.distance}</Text><Text style={styles.workoutLabel}>Distance</Text></View>
+                    <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.duration}</Text><Text style={styles.workoutLabel}>Time</Text></View>
+                    <View style={styles.workoutStat}><Text style={styles.workoutValue}>{post.workout.pace}</Text><Text style={styles.workoutLabel}>Pace</Text></View>
                   </View>
                 </View>
+              )}
+              {post.achievement && (
+                <View style={styles.achievementBadge}>
+                  <Text style={styles.achievementIcon}>{post.achievement.icon}</Text>
+                  <Text style={styles.achievementTitle}>{post.achievement.title}</Text>
+                </View>
+              )}
+              {post.event && (
+                <View style={styles.eventMini}>
+                  <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: activeColor, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>📅</Text></View>
+                  <View>
+                    <Text style={styles.eventMiniName}>{post.event.name}</Text>
+                    <Text style={styles.eventMiniDate}>{post.event.date}</Text>
+                  </View>
+                </View>
+              )}
+              <View style={styles.postActions}>
+                <TouchableOpacity style={styles.postAction}><Ionicons name="heart-outline" size={22} color={Colors.textDim} /><Text style={styles.postActionText}>{post.likes}</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.postAction}><Ionicons name="chatbubble-outline" size={20} color={Colors.textDim} /><Text style={styles.postActionText}>{post.comments}</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.postAction}><Ionicons name="share-outline" size={22} color={Colors.textDim} /></TouchableOpacity>
+                <TouchableOpacity style={[styles.postAction, { marginLeft: 'auto' }]}><Ionicons name="bookmark-outline" size={22} color={Colors.textDim} /></TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </>
+      ) : feedMode === 'pulse' ? (
+        <>
+          {/* Compose Pulse */}
+          <View style={styles.composePulse}>
+            <View style={styles.composeAvatar}><Ionicons name="person" size={20} color="white" /></View>
+            <TouchableOpacity style={{ flex: 1 }} onPress={() => setShowComposeModal(true)}>
+              <Text style={styles.composePlaceholder}>What's on your mind?</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.composeBtn, { backgroundColor: activeColor }]} onPress={() => setShowComposeModal(true)}>
+              <Text style={styles.composeBtnText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+
+          {pulsePosts.map(post => (
+            <View key={post.id} style={styles.pulsePost}>
+              <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
+                <Image source={post.athlete.avatar} style={styles.pulseAvatar} />
+              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)}>
+                    <Text style={styles.pulseName}>{post.athlete.name}</Text>
+                  </TouchableOpacity>
+                  <Ionicons name="checkmark-circle" size={12} color={activeColor} />
+                  <Text style={styles.pulseTime}>· {post.timeAgo}</Text>
+                </View>
+                <Text style={styles.pulseContent}>{post.content}</Text>
+                {post.image && (
+                  <TouchableOpacity onPress={() => setSelectedProfileId(post.athlete.id)} activeOpacity={0.9} style={{ marginBottom: 12, borderRadius: 12, overflow: 'hidden' }}>
+                    <Image source={post.image} style={{ width: '100%', height: 200, backgroundColor: '#2a2a35' }} resizeMode="cover" />
+                  </TouchableOpacity>
+                )}
+                <View style={styles.pulseActions}>
+                  <TouchableOpacity style={styles.pulseAction}>
+                    <Ionicons name="heart-outline" size={18} color={Colors.textDim} />
+                    <Text style={styles.pulseActionText}>{post.likes}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.pulseAction}>
+                    <Ionicons name="chatbubble-outline" size={16} color={Colors.textDim} />
+                    <Text style={styles.pulseActionText}>{post.comments}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.pulseAction}>
+                    <Ionicons name="repeat" size={18} color={Colors.textDim} />
+                    <Text style={styles.pulseActionText}>{post.reposts}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.pulseAction}>
+                    <Ionicons name="share-outline" size={18} color={Colors.textDim} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ))}
+        </>
+      ) : (
+        <>
+          {/* Forum Header / Tags */}
+          <View style={{ marginBottom: 16 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+              {['All', 'Strategy', 'Gear', 'Matchmaking', 'Wins', 'Nutrition'].map((tag) => (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => setForumFilter(tag)}
+                  style={{
+                    backgroundColor: forumFilter === tag ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 20
+                  }}
+                >
+                  <Text style={{ color: forumFilter === tag ? 'white' : Colors.textDim, fontWeight: '600', fontSize: 13 }}>{tag}</Text>
+                </TouchableOpacity>
               ))}
             </ScrollView>
-          </SafeAreaView>
-        </View>
+          </View>
+
+          {/* Forum Threads */}
+          {FORUM_THREADS
+            .filter(thread => forumFilter === 'All' || thread.tag === forumFilter)
+            .map((thread) => (
+              <TouchableOpacity
+                key={thread.id}
+                onPress={() => {
+                  Alert.alert('Thread Clicked', `Thread ID: ${thread.id}`);
+                  setSelectedThread(thread.id);
+                }}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.05)'
+                }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <View style={{ flex: 1, marginRight: 12 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                      <View style={{ backgroundColor: 'rgba(0,206,209,0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginRight: 8 }}>
+                        <Text style={{ color: Colors.fun, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{thread.tag}</Text>
+                      </View>
+                      <Text style={{ color: Colors.textDim, fontSize: 12 }}>@{thread.author} • {thread.time}</Text>
+                    </View>
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', lineHeight: 22, marginBottom: 4 }}>{thread.title}</Text>
+
+                    <View style={{ flexDirection: 'row', marginTop: 8, gap: 16 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <MaterialCommunityIcons name="comment-outline" size={16} color={Colors.textDim} />
+                        <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>{thread.answers} comments</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{ alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 12, paddingVertical: 6, width: 40 }}>
+                    <Ionicons name="caret-up" size={18} color={activeColor} />
+                    <Text style={{ color: 'white', fontWeight: '700', fontSize: 12, marginVertical: 1 }}>{thread.upvotes}</Text>
+                    <Ionicons name="caret-down" size={18} color={Colors.textDim} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+          <TouchableOpacity style={{ alignItems: 'center', padding: 20 }}>
+            <Text style={{ color: Colors.textDim }}>View all topics...</Text>
+          </TouchableOpacity>
+
+          <View style={{ height: 60 }} />
+        </>
       )}
-    </SafeAreaView>
+    </ScrollView>
+  </View>
+);
+      case 'market':
+if (marketView === 'all_lives') {
+  const filteredLives = MARKET_LIVE_STREAMS.filter(stream =>
+    liveCategory === 'all' || stream.category === liveCategory
   );
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={{ padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <TouchableOpacity onPress={() => setMarketView('home')} style={{ padding: 4 }}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.sectionTitle}>🔥 Live Auctions</Text>
+      </View>
+
+      {/* Categories */}
+      <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {MARKET_CATEGORIES.map(cat => (
+            <TouchableOpacity
+              key={cat.id}
+              style={[styles.tag, { backgroundColor: liveCategory === cat.id ? activeColor : Colors.surface, borderWidth: 0 }]}
+              onPress={() => setLiveCategory(cat.id)}
+            >
+              <Text style={[styles.tagText, { color: liveCategory === cat.id ? 'white' : Colors.textDim }]}>{cat.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Grid */}
+      <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          {filteredLives.map(stream => (
+            <TouchableOpacity key={stream.id} style={{ width: '48%', aspectRatio: 0.7, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface, marginBottom: 16 }}>
+              <Image source={stream.image} style={{ width: '100%', height: '100%' }} />
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120 }} />
+
+              <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                <Text style={{ color: 'white', fontSize: 10, fontWeight: '800' }}>LIVE</Text>
+              </View>
+
+              <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="eye" size={10} color="white" style={{ marginRight: 4 }} />
+                <Text style={{ color: 'white', fontSize: 10 }}>{(stream.viewers / 1000).toFixed(1)}k</Text>
+              </View>
+
+              <View style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
+                <Text style={{ color: 'white', fontWeight: '700', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{stream.title}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image source={stream.avatar} style={{ width: 16, height: 16, borderRadius: 8, marginRight: 6 }} />
+                  <Text style={{ color: Colors.textDim, fontSize: 12 }} numberOfLines={1}>{stream.host}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+// Market Home View
+const filteredProducts = MARKET_PRODUCTS.filter(p => {
+  const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+  const matchesSearch = p.name.toLowerCase().includes(marketSearch.toLowerCase());
+  const matchesCondition = p.condition === (showUsed ? 'Used' : 'New');
+  return matchesCategory && matchesSearch && matchesCondition;
+});
+
+return (
+  <View style={styles.container}>
+    {/* Market Header */}
+    <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
+      <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 12, paddingHorizontal: 12, height: 44 }}>
+          <Ionicons name="search" size={20} color={Colors.textDim} />
+          <TextInput
+            style={{ flex: 1, color: 'white', marginLeft: 8, fontSize: 16 }}
+            placeholder="Search gear, tickets..."
+            placeholderTextColor={Colors.textDim}
+            value={marketSearch}
+            onChangeText={setMarketSearch}
+          />
+        </View>
+        <TouchableOpacity
+          style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' }}
+          onPress={() => setShowScanner(true)}
+        >
+          <Ionicons name="camera" size={24} color={Colors.fun} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Categories */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        {MARKET_CATEGORIES.map(cat => (
+          <TouchableOpacity
+            key={cat.id}
+            style={[styles.tag, { backgroundColor: selectedCategory === cat.id ? activeColor : Colors.surface, borderWidth: 0 }]}
+            onPress={() => setSelectedCategory(cat.id)}
+          >
+            <Text style={[styles.tagText, { color: selectedCategory === cat.id ? 'white' : Colors.textDim }]}>{cat.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+
+    <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
+      {/* Live Auctions Section */}
+      <View style={{ marginBottom: 24 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 }}>
+          <Text style={styles.sectionTitle}>🔥 Live Auctions</Text>
+          <TouchableOpacity onPress={() => setMarketView('all_lives')}><Text style={{ color: Colors.fun }}>See All</Text></TouchableOpacity>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
+          {MARKET_LIVE_STREAMS.slice(0, 3).map(stream => (
+            <TouchableOpacity key={stream.id} style={{ width: 140, height: 200, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surface }}>
+              <Image source={stream.image} style={{ width: '100%', height: '100%' }} />
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 }} />
+
+              <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#FF0000', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                <Text style={{ color: 'white', fontSize: 10, fontWeight: '800' }}>LIVE</Text>
+              </View>
+
+              <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="eye" size={10} color="white" style={{ marginRight: 4 }} />
+                <Text style={{ color: 'white', fontSize: 10 }}>{(stream.viewers / 1000).toFixed(1)}k</Text>
+              </View>
+
+              <View style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
+                <Text style={{ color: 'white', fontWeight: '700', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{stream.title}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image source={stream.avatar} style={{ width: 16, height: 16, borderRadius: 8, marginRight: 6 }} />
+                  <Text style={{ color: Colors.textDim, fontSize: 12 }}>{stream.host}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Products Section */}
+      <View style={{ paddingHorizontal: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <Text style={styles.sectionTitle}>Top Picks</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 20, padding: 4 }}>
+            <TouchableOpacity
+              style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: !showUsed ? 'rgba(255,255,255,0.1)' : 'transparent' }}
+              onPress={() => setShowUsed(false)}
+            >
+              <Text style={{ color: !showUsed ? 'white' : Colors.textDim, fontSize: 12, fontWeight: '600' }}>New</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: showUsed ? 'rgba(255,255,255,0.1)' : 'transparent' }}
+              onPress={() => setShowUsed(true)}
+            >
+              <Text style={{ color: showUsed ? 'white' : Colors.textDim, fontSize: 12, fontWeight: '600' }}>Used</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          {filteredProducts.map(product => (
+            <TouchableOpacity key={product.id} style={{ width: '48%', backgroundColor: Colors.surface, borderRadius: 16, overflow: 'hidden', marginBottom: 16 }}>
+              <View style={{ height: 150, backgroundColor: '#fff' }}>
+                <Image source={product.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                {product.condition === 'Used' && (
+                  <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 }}>
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>USED</Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={{ padding: 12 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ color: Colors.textDim, fontSize: 10, textTransform: 'uppercase' }}>{product.category}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Ionicons name="star" size={10} color="#FFD700" />
+                    <Text style={{ color: 'white', fontSize: 10, marginLeft: 2 }}>{product.rating}</Text>
+                  </View>
+                </View>
+
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginBottom: 4 }} numberOfLines={2}>{product.name}</Text>
+                <Text style={{ color: 'white', fontWeight: '800', fontSize: 16 }}>${product.price}</Text>
+
+                {product.prime && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                    <Ionicons name="checkmark-circle" size={12} color={Colors.fun} />
+                    <Text style={{ color: Colors.fun, fontSize: 10, marginLeft: 4, fontWeight: '700' }}>PRIME</Text>
+                  </View>
+                )}
+                <Text style={{ color: Colors.textDim, fontSize: 10, marginTop: 4 }}>Sold by {product.seller}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+
+    {/* Simulated AI Scanner Modal */}
+    <Modal visible={showScanner} animationType="slide" transparent>
+      <View style={{ flex: 1, backgroundColor: 'black' }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          {/* Camera Header */}
+          <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
+            <TouchableOpacity onPress={() => setShowScanner(false)}>
+              <Ionicons name="close" size={28} color="white" />
+            </TouchableOpacity>
+            <Text style={{ color: 'white', fontWeight: '700', fontSize: 16 }}>AI Product Scanner</Text>
+            <Ionicons name="flash-off" size={24} color="white" />
+          </View>
+
+          {/* Camera Viewfinder (Simulated) */}
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {/* Background Camera Feed Simulation */}
+            <Image
+              source={require('./assets/images/market_nike.png')}
+              style={{ position: 'absolute', width: '80%', height: '40%', opacity: 0.5 }}
+              resizeMode="contain"
+            />
+            <Text style={{ position: 'absolute', color: 'rgba(255,255,255,0.3)', top: '20%' }}>Simulated Camera Feed</Text>
+
+            {/* Scanning Frame */}
+            <View style={{ width: 300, height: 300, borderWidth: 2, borderColor: isScanning ? Colors.fun : 'white', borderRadius: 24, justifyContent: 'center', alignItems: 'center' }}>
+              {isScanning && (
+                <Animated.View style={{
+                  width: '100%',
+                  height: 2,
+                  backgroundColor: Colors.fun,
+                  shadowColor: Colors.fun,
+                  shadowOpacity: 1,
+                  shadowRadius: 10,
+                  top: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 290] })
+                }} />
+              )}
+              {!isScanning && !scanResult && <Text style={{ color: 'white', fontWeight: '600' }}>Align product in frame</Text>}
+            </View>
+
+            {/* HUD Overlay */}
+            {isScanning && (
+              <View style={{ position: 'absolute', bottom: 150, padding: 16, backgroundColor: 'rgba(0,0,0,0.8)', borderRadius: 12 }}>
+                <Text style={{ color: Colors.fun, fontWeight: '700' }}>Analyzing object...</Text>
+                <Text style={{ color: 'white', fontSize: 12 }}>Identifying features...</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Camera Controls / Result */}
+          <View style={{ padding: 32, alignItems: 'center' }}>
+            {!scanResult ? (
+              <TouchableOpacity
+                style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 6, borderColor: 'white', justifyContent: 'center', alignItems: 'center' }}
+                onPress={() => {
+                  setIsScanning(true);
+                  SoundEffects.playBeep();
+
+                  // Simulate scanning process
+                  Animated.loop(
+                    Animated.sequence([
+                      Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: false }),
+                      Animated.timing(pulseAnim, { toValue: 0, duration: 1000, useNativeDriver: false })
+                    ])
+                  ).start();
+
+                  setTimeout(() => {
+                    setIsScanning(false);
+                    SoundEffects.playSuccess();
+                    setScanResult(MARKET_PRODUCTS[0]); // Find Nike Metcon result
+                  }, 3000);
+                }}
+              >
+                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'white' }} />
+              </TouchableOpacity>
+            ) : (
+              // Result Card
+              <View style={{ width: '100%', backgroundColor: Colors.surface, padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+                <Image source={scanResult.image} style={{ width: 60, height: 60, borderRadius: 8, backgroundColor: 'white' }} resizeMode="contain" />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: Colors.fun, fontSize: 12, fontWeight: '700' }}>MATCH FOUND!</Text>
+                  <Text style={{ color: 'white', fontWeight: '700', fontSize: 16 }}>{scanResult.name}</Text>
+                  <Text style={{ color: Colors.textDim, fontSize: 14 }}>${scanResult.price} · {scanResult.seller}</Text>
+                </View>
+                <TouchableOpacity
+                  style={{ backgroundColor: Colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 }}
+                  onPress={() => { setShowScanner(false); setScanResult(null); }}
+                >
+                  <Text style={{ color: 'white', fontWeight: '700' }}>View</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </SafeAreaView>
+      </View>
+    </Modal>
+  </View>
+);
+      case 'profile':
+return (
+  <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
+    {/* 1. Header Section */}
+    <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 24 }}>
+      <View style={styles.avatarCircle}>
+        <MaterialCommunityIcons name="account" size={60} color={Colors.textDim} />
+        <View style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          backgroundColor: selectedGoal === 'race' ? Colors.race : Colors.fun,
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderWidth: 3,
+          borderColor: Colors.background
+        }}>
+          <MaterialCommunityIcons
+            name={selectedGoal === 'race' ? "trophy-variant-outline" : "party-popper"}
+            size={18}
+            color="white"
+          />
+        </View>
+      </View>
+      <Text style={styles.profileName}>Guest Athlete</Text>
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
+          <MaterialCommunityIcons name={selectedGender === 'male' ? "gender-male" : selectedGender === 'female' ? "gender-female" : "gender-male-female"} size={14} color={Colors.textDim} />
+          <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>{selectedGender ? selectedGender.charAt(0).toUpperCase() + selectedGender.slice(1) : 'Not Set'}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
+          <Ionicons name="location-outline" size={14} color={Colors.textDim} />
+          <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>New York, NY</Text>
+        </View>
+      </View>
+    </View>
+
+    {/* 1.5 Growth Hack: Trophy Case */}
+    <View style={{ marginBottom: 24, paddingHorizontal: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <Text style={styles.sectionTitle}>🏆 Badges</Text>
+        <TouchableOpacity onPress={() => {
+          // Growth Hack: Simulate Share
+          if (!unlockedBadges.includes('hype')) {
+            SoundEffects.playSuccess();
+            setUnlockedBadges(prev => [...prev, 'hype']);
+            alert("🔥 HYPE BADGE UNLOCKED! Thanks for sharing!");
+          }
+        }}>
+          <Text style={{ color: Colors.fun, fontWeight: '700', fontSize: 13 }}>Share & Earn</Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
+        {BADGES.map(badge => {
+          const isUnlocked = unlockedBadges.includes(badge.id);
+          return (
+            <View key={badge.id} style={{
+              alignItems: 'center',
+              backgroundColor: isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
+              padding: 12,
+              borderRadius: 16,
+              minWidth: 100,
+              borderWidth: 1,
+              borderColor: isUnlocked ? 'rgba(255,255,255,0.2)' : 'transparent'
+            }}>
+              <View style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: isUnlocked ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.05)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 8,
+                opacity: isUnlocked ? 1 : 0.3
+              }}>
+                <MaterialCommunityIcons name={badge.icon as any} size={24} color={isUnlocked ? badge.color : 'white'} />
+              </View>
+              <Text style={{ color: isUnlocked ? 'white' : Colors.textDim, fontWeight: '700', fontSize: 13 }}>{badge.label}</Text>
+              <Text style={{ color: Colors.textDim, fontSize: 10, marginTop: 2 }}>{badge.description}</Text>
+              {!isUnlocked && (
+                <View style={{ position: 'absolute', top: 8, right: 8 }}>
+                  <Ionicons name="lock-closed" size={10} color={Colors.textDim} />
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
+
+    {/* 2. Stats Grid (Placeholder) */}
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, marginBottom: 32 }}>
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>12</Text>
+        <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Workouts</Text>
+      </View>
+      <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>4</Text>
+        <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Events</Text>
+      </View>
+      <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>88</Text>
+        <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Followers</Text>
+      </View>
+    </View>
+
+    {/* 3. Helper: Section Header */}
+    <View style={{ paddingHorizontal: 16 }}>
+
+      {/* HYROX DNA */}
+      <View style={{ marginBottom: 32 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Text style={styles.sectionTitle}>🧬 Your HYROX DNA</Text>
+          <TouchableOpacity>
+            <MaterialCommunityIcons name="pencil-outline" size={20} color={Colors.textDim} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Strengths */}
+        {selectedHyroxStrengths.length > 0 && (
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{ color: '#4ADE80', fontSize: 14, fontWeight: '700', marginBottom: 12, textTransform: 'uppercase' }}>Strengths</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+              {HYROX_STATIONS.filter(s => selectedHyroxStrengths.includes(s.id)).map(station => (
+                <View key={station.id} style={[styles.hyroxChipSimple, { backgroundColor: '#4ADE80', borderColor: '#4ADE80' }]}>
+                  <MaterialCommunityIcons name={station.icon as any} size={18} color="black" />
+                  <Text style={[styles.hyroxChipLabel, { color: 'black' }]}>{station.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Weaknesses */}
+        {selectedHyroxWeaknesses.length > 0 && (
+          <View>
+            <Text style={{ color: '#FB7185', fontSize: 14, fontWeight: '700', marginBottom: 12, textTransform: 'uppercase' }}>Needs Work</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+              {HYROX_STATIONS.filter(s => selectedHyroxWeaknesses.includes(s.id)).map(station => (
+                <View key={station.id} style={[styles.hyroxChipSimple, { backgroundColor: '#FB7185', borderColor: '#FB7185' }]}>
+                  <MaterialCommunityIcons name={station.icon as any} size={18} color="black" />
+                  <Text style={[styles.hyroxChipLabel, { color: 'black' }]}>{station.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {selectedHyroxStrengths.length === 0 && selectedHyroxWeaknesses.length === 0 && (
+          <Text style={{ color: Colors.textDim, fontStyle: 'italic' }}>No HYROX data set yet. Edit profile to add.</Text>
+        )}
+      </View>
+
+      {/* Vibe Check */}
+      <View style={{ marginBottom: 32 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Text style={styles.sectionTitle}>✨ Your Vibe</Text>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          {VIBES.filter(v => selectedVibes.includes(v.id)).map(vibe => (
+            <View key={vibe.id} style={styles.activityChip}>
+              <Text style={styles.activityChipText}>{vibe.label}</Text>
+            </View>
+          ))}
+          {selectedVibes.length === 0 && (
+            <Text style={{ color: Colors.textDim, fontStyle: 'italic' }}>No vibes selected.</Text>
+          )}
+        </View>
+      </View>
+
+      {/* Settings / Actions */}
+      <TouchableOpacity style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 16
+      }}>
+        <Ionicons name="settings-outline" size={20} color="white" />
+        <Text style={{ color: 'white', fontWeight: '700', marginLeft: 8 }}>Settings</Text>
+      </TouchableOpacity>
+
+      <Text style={{ color: Colors.textDim, textAlign: 'center', fontSize: 12 }}>Version 1.0.0 (Beta)</Text>
+
+    </View>
+  </ScrollView>
+);
+}
+  };
+
+return (
+  <SafeAreaView style={styles.container}>
+    <StatusBar style="light" />
+
+    {/* Header */}
+    <View style={styles.header}>
+      <View>
+        <Text style={styles.headerTitle}>{activeTab.toUpperCase()}</Text>
+      </View>
+    </View>
+
+    {/* Content */}
+    <View style={styles.content}>{renderContent()}</View>
+
+    {/* Tab Bar */}
+    <View style={styles.tabBar}>
+      {TABS.map(tab => (
+        <TouchableOpacity key={tab.name} style={styles.tabItem} onPress={() => setActiveTab(tab.name)}>
+          <Ionicons name={tab.icon} size={24} color={activeTab === tab.name ? activeColor : Colors.textDim} />
+          <Text style={[styles.tabLabel, { color: activeTab === tab.name ? activeColor : Colors.textDim }]}>{tab.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+
+    {/* Forum Thread Modal - Root Level */}
+    {selectedThread && (
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.95)' }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => setSelectedThread(null)}>
+              <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>Discussion</Text>
+            <TouchableOpacity>
+              <Ionicons name="ellipsis-horizontal" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={{ flex: 1, padding: 16 }}>
+            {/* Original Post */}
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, marginBottom: 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <View style={{ backgroundColor: 'rgba(0,206,209,0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginRight: 8 }}>
+                  <Text style={{ color: Colors.fun, fontSize: 10, fontWeight: '800' }}>GEAR</Text>
+                </View>
+                <Text style={{ color: Colors.textDim, fontSize: 12 }}>@Sarahfit • 2h ago</Text>
+              </View>
+              <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Best shoes for Hyrox Manchester? 👟</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 20 }}>
+                Looking for recommendations for Hyrox Manchester in 3 weeks. I usually wear Nike Metcons but wondering if I should switch to something lighter for the running. What do you all think?
+              </Text>
+            </View>
+
+            {/* Comments */}
+            <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 16 }}>34 Comments</Text>
+
+            {[
+              { author: 'CoachMike', time: '1h ago', content: 'I swear by On Cloudmonsters for HYROX. Great cushioning for the runs and stable enough for the stations.' },
+              { author: 'FitJess', time: '45m ago', content: 'Agree with CoachMike! Also the Hoka Speedgoats are 🔥' },
+              { author: 'BeastMode', time: '30m ago', content: 'Metcons are fine if you\'re used to them. Don\'t change shoes close to race day!' }
+            ].map((comment, i) => (
+              <View key={i} style={{ flexDirection: 'row', marginBottom: 20 }}>
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', marginRight: 12 }} />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                    <Text style={{ color: 'white', fontWeight: '700', marginRight: 8 }}>@{comment.author}</Text>
+                    <Text style={{ color: Colors.textDim, fontSize: 12 }}>{comment.time}</Text>
+                  </View>
+                  <Text style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 20 }}>{comment.content}</Text>
+                  <View style={{ flexDirection: 'row', marginTop: 8, gap: 16 }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="heart-outline" size={16} color={Colors.textDim} />
+                      <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>12</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                      <Text style={{ color: Colors.textDim, fontSize: 13 }}>Reply</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    )}
+  </SafeAreaView>
+);
 }
 
 const styles = StyleSheet.create({
@@ -2635,8 +2609,8 @@ const styles = StyleSheet.create({
   // Content
   content: { flex: 1 },
   scrollContent: { flex: 1 },
-  cardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16, paddingBottom: 80 },
-  card: { width: Math.min(width - 32, 360), height: Math.min(height * 0.6, 480), borderRadius: 24, backgroundColor: '#2a2a35', overflow: 'hidden' },
+  cardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
+  card: { width: Math.min(width - 32, 360), height: Math.min(height * 0.55, 460), borderRadius: 24, backgroundColor: '#2a2a35', overflow: 'hidden' },
   cardGradient: { ...StyleSheet.absoluteFillObject },
   modeBadge: { position: 'absolute', top: 16, right: 16, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   modeBadgeText: { fontSize: 12, fontWeight: '700', color: 'white' },
