@@ -1363,7 +1363,7 @@ export default function App() {
 
             <ScrollView
               style={{ flex: 1, marginTop: 10 }}
-              contentContainerStyle={{ paddingBottom: 140 }}
+              contentContainerStyle={{ paddingBottom: 220 }}
               showsVerticalScrollIndicator={false}
             >
               {/* Strengths Section */}
@@ -1526,106 +1526,113 @@ export default function App() {
             {/* Content: Stack or Grid */}
             {matchViewMode === 'stack' ? (
               filteredAthletes.length > 0 ? (
-                <View style={styles.cardContainer}>
-                  {/* Next Card (Behind) */}
-                  <View style={[styles.card, { position: 'absolute', transform: [{ scale: 0.95 }], opacity: 0.8 }]}>
-                    <Image source={nextAthlete.avatar} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />
-                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)', '#000']} style={styles.cardGradient} />
-                    <View style={[styles.modeBadge, { backgroundColor: nextAthlete.mode === 'race' ? Colors.race : Colors.fun }]}>
-                      <Text style={styles.modeBadgeText}>{nextAthlete.mode === 'race' ? '🏁 RACE' : '🎉 FUN'}</Text>
-                    </View>
-                    <View style={styles.cardContent}>
-                      <Text style={styles.athleteName}>{nextAthlete.name}, {nextAthlete.age}</Text>
-                      <Text style={styles.locationText}><Ionicons name="location" size={12} color={Colors.textDim} /> {nextAthlete.location}</Text>
-                      <Text style={styles.bioText}>{nextAthlete.bio}</Text>
-                      <View style={styles.tag}><Text style={styles.tagText}>{nextAthlete.vibeCheck}</Text></View>
-                    </View>
-                  </View>
-
-                  {/* Current Card (Animated) */}
-                  <Animated.View
-                    {...panResponder.panHandlers}
-                    style={[styles.card, rotateAndTranslate]}
+                <View style={{ flex: 1 }}>
+                  <ScrollView
+                    contentContainerStyle={{ alignItems: 'center', paddingTop: 20, paddingBottom: 100 }}
+                    style={{ flex: 1 }}
+                    showsVerticalScrollIndicator={false}
                   >
-                    {/* Photo Carousel */}
-                    {currentAthlete.photos?.map((photo, idx) => (
-                      <Image
-                        key={idx}
-                        source={photo}
-                        style={{
-                          position: 'absolute',
-                          width: '100%',
-                          height: '100%',
-                          opacity: idx === cardPhotoIndex ? 1 : 0
-                        }}
-                        resizeMode="cover"
-                      />
-                    )) || <Image source={currentAthlete.avatar} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />}
+                    <View style={styles.cardContainer}>
+                      {/* Next Card (Behind) */}
+                      <View style={[styles.card, { position: 'absolute', transform: [{ scale: 0.95 }], opacity: 0.8 }]}>
+                        <Image source={nextAthlete.avatar} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />
+                        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)', '#000']} style={styles.cardGradient} />
+                        <View style={[styles.modeBadge, { backgroundColor: nextAthlete.mode === 'race' ? Colors.race : Colors.fun }]}>
+                          <Text style={styles.modeBadgeText}>{nextAthlete.mode === 'race' ? '🏁 RACE' : '🎉 FUN'}</Text>
+                        </View>
+                        <View style={styles.cardContent}>
+                          <Text style={styles.athleteName}>{nextAthlete.name}, {nextAthlete.age}</Text>
+                          <Text style={styles.locationText}><Ionicons name="location" size={12} color={Colors.textDim} /> {nextAthlete.location}</Text>
+                          <Text style={styles.bioText}>{nextAthlete.bio}</Text>
+                          <View style={styles.tag}><Text style={styles.tagText}>{nextAthlete.vibeCheck}</Text></View>
+                        </View>
+                      </View>
+
+                      {/* Current Card (Animated) */}
+                      <Animated.View
+                        {...panResponder.panHandlers}
+                        style={[styles.card, rotateAndTranslate]}
+                      >
+                        {/* Photo Carousel */}
+                        {currentAthlete.photos?.map((photo, idx) => (
+                          <Image
+                            key={idx}
+                            source={photo}
+                            style={{
+                              position: 'absolute',
+                              width: '100%',
+                              height: '100%',
+                              opacity: idx === cardPhotoIndex ? 1 : 0
+                            }}
+                            resizeMode="cover"
+                          />
+                        )) || <Image source={currentAthlete.avatar} style={{ position: 'absolute', width: '100%', height: '100%' }} resizeMode="cover" />}
 
 
-                    {/* Gradient Overlay */}
-                    <LinearGradient colors={['transparent', 'transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+                        {/* Gradient Overlay */}
+                        <LinearGradient colors={['transparent', 'transparent', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
 
-                    {/* Tap Zones for Photos */}
-                    <View style={{ flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 150 }}>
-                      <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.max(0, i - 1))} />
-                      <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.min((currentAthlete.photos?.length || 1) - 1, i + 1))} />
-                    </View>
+                        {/* Tap Zones for Photos */}
+                        <View style={{ flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 150 }}>
+                          <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.max(0, i - 1))} />
+                          <TouchableOpacity style={{ flex: 1 }} onPress={() => setCardPhotoIndex(i => Math.min((currentAthlete.photos?.length || 1) - 1, i + 1))} />
+                        </View>
 
-                    <View style={[styles.modeBadge, { backgroundColor: currentAthlete.mode === 'race' ? Colors.race : Colors.fun }]}>
-                      <Text style={styles.modeBadgeText}>{currentAthlete.mode === 'race' ? '🏁 RACE' : '🎉 FUN'}</Text>
-                    </View>
+                        <View style={[styles.modeBadge, { backgroundColor: currentAthlete.mode === 'race' ? Colors.race : Colors.fun }]}>
+                          <Text style={styles.modeBadgeText}>{currentAthlete.mode === 'race' ? '🏁 RACE' : '🎉 FUN'}</Text>
+                        </View>
 
-                    <View style={styles.cardContent}>
-                      <Text style={styles.athleteName}>{currentAthlete.name}, {currentAthlete.age}</Text>
-                      <Text style={styles.locationText}><Ionicons name="location" size={12} color={Colors.textDim} /> {currentAthlete.location}</Text>
-                      <Text style={styles.bioText}>{currentAthlete.bio}</Text>
-                      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                        <View style={styles.tag}><Text style={styles.tagText}>{currentAthlete.vibeCheck}</Text></View>
+                        <View style={styles.cardContent}>
+                          <Text style={styles.athleteName}>{currentAthlete.name}, {currentAthlete.age}</Text>
+                          <Text style={styles.locationText}><Ionicons name="location" size={12} color={Colors.textDim} /> {currentAthlete.location}</Text>
+                          <Text style={styles.bioText}>{currentAthlete.bio}</Text>
+                          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                            <View style={styles.tag}><Text style={styles.tagText}>{currentAthlete.vibeCheck}</Text></View>
+                          </View>
+                        </View>
+
+                        {/* Action Buttons Overlay */}
+                        <View style={{ position: 'absolute', bottom: 20, right: 20, flexDirection: 'row', gap: 16 }}>
+                          <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.race }} onPress={() => { SoundEffects.playTap(); setCurrentIndex(currentIndex + 1); }}>
+                            <Ionicons name="close" size={24} color={Colors.race} />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: activeColor, justifyContent: 'center', alignItems: 'center', shadowColor: activeColor, shadowOpacity: 0.5, shadowRadius: 10 }} onPress={() => { SoundEffects.playSuccess(); setCurrentIndex(currentIndex + 1); }}>
+                            <Ionicons name="heart" size={30} color="white" />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.fun }} onPress={() => { SoundEffects.playCelebration(); setCurrentIndex(currentIndex + 1); }}>
+                            <Ionicons name="star" size={24} color={Colors.fun} />
+                          </TouchableOpacity>
+                        </View>
+                      </Animated.View>
+
+                      {/* Photo Thumbnails (Outside Card) */}
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 24 }}>
+                        {currentAthlete.photos?.map((photo, idx) => (
+                          <TouchableOpacity
+                            key={idx}
+                            onPress={() => { SoundEffects.playTap(); setCardPhotoIndex(idx); }}
+                            style={{
+                              width: 60,
+                              height: 60,
+                              borderRadius: 12,
+                              overflow: 'hidden',
+                              borderWidth: idx === cardPhotoIndex ? 3 : 2,
+                              borderColor: idx === cardPhotoIndex ? activeColor : 'rgba(255,255,255,0.3)',
+                              opacity: idx === cardPhotoIndex ? 1 : 0.6,
+                              backgroundColor: 'rgba(0,0,0,0.3)',
+                            }}
+                          >
+                            <Image
+                              source={photo}
+                              style={{ width: '100%', height: '100%' }}
+                              resizeMode="cover"
+                            />
+                          </TouchableOpacity>
+                        ))}
                       </View>
                     </View>
-
-                    {/* Action Buttons Overlay */}
-                    <View style={{ position: 'absolute', bottom: 20, right: 20, flexDirection: 'row', gap: 16 }}>
-                      <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.race }} onPress={() => { SoundEffects.playTap(); setCurrentIndex(currentIndex + 1); }}>
-                        <Ionicons name="close" size={24} color={Colors.race} />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: activeColor, justifyContent: 'center', alignItems: 'center', shadowColor: activeColor, shadowOpacity: 0.5, shadowRadius: 10 }} onPress={() => { SoundEffects.playSuccess(); setCurrentIndex(currentIndex + 1); }}>
-                        <Ionicons name="heart" size={30} color="white" />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.fun }} onPress={() => { SoundEffects.playCelebration(); setCurrentIndex(currentIndex + 1); }}>
-                        <Ionicons name="star" size={24} color={Colors.fun} />
-                      </TouchableOpacity>
-                    </View>
-                  </Animated.View>
-
-                  {/* Photo Thumbnails (Outside Card) */}
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 24 }}>
-                    {currentAthlete.photos?.map((photo, idx) => (
-                      <TouchableOpacity
-                        key={idx}
-                        onPress={() => { SoundEffects.playTap(); setCardPhotoIndex(idx); }}
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 12,
-                          overflow: 'hidden',
-                          borderWidth: idx === cardPhotoIndex ? 3 : 2,
-                          borderColor: idx === cardPhotoIndex ? activeColor : 'rgba(255,255,255,0.3)',
-                          opacity: idx === cardPhotoIndex ? 1 : 0.6,
-                          backgroundColor: 'rgba(0,0,0,0.3)',
-                        }}
-                      >
-                        <Image
-                          source={photo}
-                          style={{ width: '100%', height: '100%' }}
-                          resizeMode="cover"
-                        />
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  </ScrollView>
                 </View>
-
               ) : (
                 <View style={[styles.centered, { flex: 1, minHeight: 400 }]}>
                   <Text style={{ color: Colors.textDim }}>No athletes found with current filters.</Text>
@@ -2604,8 +2611,25 @@ const styles = StyleSheet.create({
   // Content
   content: { flex: 1 },
   scrollContent: { flex: 1 },
-  cardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
-  card: { width: Math.min(width - 32, 360), height: Math.min(height * 0.55, 460), borderRadius: 24, backgroundColor: '#2a2a35', overflow: 'hidden' },
+  // Card Stack
+  cardContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 20
+  },
+  card: {
+    width: Math.min(width - 32, 360),
+    height: Math.min(height * 0.5, 420),
+    borderRadius: 24,
+    backgroundColor: '#2a2a35',
+    overflow: 'hidden',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10
+  },
   cardGradient: { ...StyleSheet.absoluteFillObject },
   modeBadge: { position: 'absolute', top: 16, right: 16, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   modeBadgeText: { fontSize: 12, fontWeight: '700', color: 'white' },
