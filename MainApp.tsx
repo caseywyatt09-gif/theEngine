@@ -1358,7 +1358,7 @@ export default function App() {
         {onboardingStep === 4 && (
           // STEP 4: HYROX Stations - Strengths & Weaknesses
           <View style={styles.onboardingContent}>
-            <Text style={[styles.onboardingTitle, { marginTop: 10, fontSize: 24 }]}>Your HYROX Profile (Root) 💪</Text>
+            <Text style={[styles.onboardingTitle, { marginTop: 10, fontSize: 24 }]}>Your HYROX Profile 💪</Text>
             <Text style={styles.onboardingSubtitle}>Select your strengths & weaknesses to find complementary partners</Text>
 
             <ScrollView
@@ -1477,7 +1477,7 @@ export default function App() {
                   style={[styles.modeChip, { backgroundColor: matchFilters.race ? Colors.race : 'transparent', borderWidth: 1, borderColor: Colors.race }]}
                   onPress={() => setMatchFilters(f => ({ ...f, race: !f.race }))}
                 >
-                  <Text style={[styles.modeChipText, { color: matchFilters.race ? 'white' : Colors.race, fontSize: 13 }]}>🏁 Race (Root)</Text>
+                  <Text style={[styles.modeChipText, { color: matchFilters.race ? 'white' : Colors.race, fontSize: 13 }]}>🏁 Race</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modeChip, { backgroundColor: matchFilters.fun ? Colors.fun : 'transparent', borderWidth: 1, borderColor: Colors.fun }]}
