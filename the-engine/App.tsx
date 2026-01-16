@@ -2635,7 +2635,7 @@ const styles = StyleSheet.create({
   // Content
   content: { flex: 1 },
   scrollContent: { flex: 1 },
-  cardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
+  cardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16, paddingBottom: 80 },
   card: { width: Math.min(width - 32, 360), height: Math.min(height * 0.6, 480), borderRadius: 24, backgroundColor: '#2a2a35', overflow: 'hidden' },
   cardGradient: { ...StyleSheet.absoluteFillObject },
   modeBadge: { position: 'absolute', top: 16, right: 16, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
