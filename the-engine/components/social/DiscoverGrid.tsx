@@ -1,4 +1,5 @@
 import { View, Text, Image, TouchableOpacity, Dimensions, ScrollView, TextInput, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
 
@@ -25,6 +26,7 @@ const DISCOVER_ITEMS = [
 const FILTERS = ['Top', 'Workouts', 'Nutrition', 'Gear', 'Hyrox', 'Marathon'];
 
 export function DiscoverGrid() {
+    const router = useRouter();
     return (
         <View style={styles.container}>
             {/* Search Bar */}
@@ -52,7 +54,11 @@ export function DiscoverGrid() {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.grid}>
                 {DISCOVER_ITEMS.map((item, index) => {
                     return (
-                        <TouchableOpacity key={item.id} style={styles.gridItem}>
+                        <TouchableOpacity
+                            key={item.id}
+                            style={styles.gridItem}
+                            onPress={() => router.push(`/post/${item.id}`)}
+                        >
                             <Image
                                 source={{ uri: item.uri }}
                                 style={styles.image}

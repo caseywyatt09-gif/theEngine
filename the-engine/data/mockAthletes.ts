@@ -6,6 +6,7 @@ export interface Athlete {
     displayName: string;
     username: string;
     avatar: ImageSourcePropType;
+    photos?: ImageSourcePropType[];
     bio: string;
     location: string;
     currentMode: AppMode;
@@ -26,6 +27,11 @@ export const MOCK_ATHLETES: Athlete[] = [
         displayName: 'Sarah Chen',
         username: '@sarahflies',
         avatar: require('../assets/images/athletes/sarah.png'),
+        photos: [
+            require('../assets/images/athletes/sarah.png'),
+            require('../assets/images/lifestyle/coffee_run.png'),
+            require('../assets/images/lifestyle/hiking_view.png'),
+        ],
         bio: 'Boston qualifier chasing that sub-3 🏃‍♀️ Marathon lover, sunrise runner, post-race brunch enthusiast.',
         location: '5 miles away',
         currentMode: 'race',
@@ -43,6 +49,11 @@ export const MOCK_ATHLETES: Athlete[] = [
         displayName: 'Marcus Johnson',
         username: '@marcusj_tri',
         avatar: require('../assets/images/athletes/marcus.png'),
+        photos: [
+            require('../assets/images/athletes/marcus.png'),
+            require('../assets/images/lifestyle/gym_selfie.png'),
+            require('../assets/images/lifestyle/hiking_view.png'),
+        ],
         bio: 'Ironman finisher x3 🦾 Former swimmer turned triathlete. Long Sunday rides are my therapy.',
         location: '12 miles away',
         currentMode: 'race',
@@ -60,6 +71,11 @@ export const MOCK_ATHLETES: Athlete[] = [
         displayName: 'Emily Rodriguez',
         username: '@em_runs_happy',
         avatar: require('../assets/images/athletes/emily.png'),
+        photos: [
+            require('../assets/images/athletes/emily.png'),
+            require('../assets/images/lifestyle/hiking_view.png'),
+            require('../assets/images/lifestyle/coffee_run.png'),
+        ],
         bio: 'Trail vibes only 🌲 Here for the views, not the Strava kudos. Weekend adventures > intervals.',
         location: '3 miles away',
         currentMode: 'fun',

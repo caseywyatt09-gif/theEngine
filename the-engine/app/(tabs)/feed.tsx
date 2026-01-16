@@ -28,7 +28,97 @@ export default function FeedScreen() {
 
     const storyAthletes = MOCK_ATHLETES.slice(0, 8);
 
-    const [view, setView] = useState<'feed' | 'discover'>('feed'); // Toggle state
+    const [view, setView] = useState<'feed' | 'discover' | 'pulse'>('feed'); // Toggle state
+
+    // Mock Pulse/Thread posts
+    const PULSE_POSTS = [
+        {
+            id: 'p1',
+            author: 'Sarah Chen',
+            handle: '@sarahfitness',
+            avatar: require('../../assets/images/athletes/sarah.png'),
+            content: 'Just crushed my first sub-60 HYROX! 🔥 All those sled pushes finally paid off. Who else is racing in Miami next month?',
+            likes: 234,
+            replies: 45,
+            reposts: 12,
+            time: '2h',
+        },
+        {
+            id: 'p2',
+            author: 'Marcus Johnson',
+            handle: '@marcusruns',
+            avatar: require('../../assets/images/athletes/marcus.png'),
+            content: 'Hot take: Wall balls are harder than burpee broad jumps. Fight me. 😤\n\nThe leg burn is REAL after 100 reps.',
+            likes: 567,
+            replies: 89,
+            reposts: 34,
+            time: '4h',
+        },
+        {
+            id: 'p3',
+            author: 'Emily Davis',
+            handle: '@emtrains',
+            avatar: require('../../assets/images/athletes/emily.png'),
+            content: 'Recovery tip: Ice bath + compression boots + 8hrs sleep = back at it tomorrow.\n\nWhat\'s your recovery stack? 👇',
+            likes: 189,
+            replies: 67,
+            reposts: 8,
+            time: '6h',
+        },
+        {
+            id: 'p4',
+            author: 'Jake Martinez',
+            handle: '@jakemartinez',
+            avatar: require('../../assets/images/athletes/jake.png'),
+            content: 'New PB on the SkiErg today: 3:12 for 1000m 💪\n\nCoach said I need to work on my breathing. Video analysis coming soon!',
+            likes: 312,
+            replies: 23,
+            reposts: 15,
+            time: '8h',
+        },
+        {
+            id: 'p5',
+            author: 'Priya Patel',
+            handle: '@priyapatel',
+            avatar: require('../../assets/images/athletes/priya.png'),
+            content: 'Looking for a training partner in SF Bay Area. I train 5x/week, usually mornings. DM me! 🏃‍♀️\n\n#HyroxTraining #FitnessCommunity',
+            likes: 145,
+            replies: 56,
+            reposts: 22,
+            time: '12h',
+        },
+    ];
+
+    const renderPulsePost = (post: typeof PULSE_POSTS[0]) => (
+        <TouchableOpacity key={post.id} style={styles.pulsePost}>
+            <Image source={post.avatar} style={styles.pulseAvatar} />
+            <View style={styles.pulseContent}>
+                <View style={styles.pulseHeader}>
+                    <Text style={styles.pulseAuthor}>{post.author}</Text>
+                    <Text style={styles.pulseHandle}>{post.handle}</Text>
+                    <Text style={styles.pulseTime}>· {post.time}</Text>
+                </View>
+                <Text style={styles.pulseText}>{post.content}</Text>
+                <View style={styles.pulseActions}>
+                    <TouchableOpacity style={styles.pulseAction}>
+                        <Ionicons name="chatbubble-outline" size={18} color="#666" />
+                        <Text style={styles.pulseActionText}>{post.replies}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.pulseAction}>
+                        <Ionicons name="repeat-outline" size={20} color="#666" />
+                        <Text style={styles.pulseActionText}>{post.reposts}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.pulseAction}>
+                        <Ionicons name="heart-outline" size={18} color="#666" />
+                        <Text style={styles.pulseActionText}>{post.likes}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.pulseAction}>
+                        <Ionicons name="share-outline" size={18} color="#666" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </TouchableOpacity>
+    );
 
     const renderHeader = () => (
         <View>
@@ -67,15 +157,7 @@ export default function FeedScreen() {
 
             {/* Custom Header with Toggle */}
             <View style={styles.topHeader}>
-                <View style={styles.headerTitleRow}>
-                    <TouchableOpacity onPress={() => setView('feed')}>
-                        <Text style={[styles.headerTitle, view === 'feed' ? styles.activeTitle : styles.inactiveTitle]}>Feed</Text>
-                    </TouchableOpacity>
-                    <View style={styles.headerDivider} />
-                    <TouchableOpacity onPress={() => setView('discover')}>
-                        <Text style={[styles.headerTitle, view === 'discover' ? styles.activeTitle : styles.inactiveTitle]}>Discover</Text>
-                    </TouchableOpacity>
-                </View>
+                <Text style={styles.headerBrand}>FEED</Text>
 
                 <View style={styles.headerIcons}>
                     <TouchableOpacity style={styles.iconBtn}>
@@ -85,6 +167,31 @@ export default function FeedScreen() {
                         <Ionicons name="paper-plane-outline" size={26} color="white" />
                     </TouchableOpacity>
                 </View>
+            </View>
+
+            {/* Content Toggle Pills */}
+            <View style={styles.pillContainer}>
+                {[
+                    { key: 'feed', label: 'Feed' },
+                    { key: 'discover', label: 'Discover' },
+                    { key: 'pulse', label: 'Pulse' },
+                ].map((tab) => (
+                    <TouchableOpacity
+                        key={tab.key}
+                        onPress={() => setView(tab.key as 'feed' | 'discover' | 'pulse')}
+                        style={[
+                            styles.pillItem,
+                            view === tab.key && styles.pillActive
+                        ]}
+                    >
+                        <Text style={[
+                            styles.pillText,
+                            view === tab.key && styles.pillTextActive
+                        ]}>
+                            {tab.label}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
             </View>
 
             {/* Content Area */}
@@ -105,8 +212,21 @@ export default function FeedScreen() {
                     ListHeaderComponent={renderHeader}
                     showsVerticalScrollIndicator={false}
                 />
-            ) : (
+            ) : view === 'discover' ? (
                 <DiscoverGrid />
+            ) : (
+                <ScrollView style={styles.pulseContainer} showsVerticalScrollIndicator={false}>
+                    {/* Compose Button */}
+                    <TouchableOpacity style={styles.composeBar}>
+                        <Image source={require('../../assets/images/athletes/sarah.png')} style={styles.composeAvatar} />
+                        <Text style={styles.composePlaceholder}>What's your training update?</Text>
+                        <TouchableOpacity style={styles.composeBtn}>
+                            <Ionicons name="send" size={20} color="white" />
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                    <View style={styles.divider} />
+                    {PULSE_POSTS.map(renderPulsePost)}
+                </ScrollView>
             )}
         </SafeAreaView>
     );
@@ -153,6 +273,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
         marginHorizontal: 12,
     },
+    headerBrand: {
+        fontSize: 24,
+        fontWeight: '800',
+        color: 'white',
+        letterSpacing: -1,
+    },
     headerIcons: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -160,6 +286,31 @@ const styles = StyleSheet.create({
     },
     iconBtn: {
         // Hit slop could be added here
+    },
+    pillContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        gap: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#1a1a1a',
+    },
+    pillItem: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: '#1a1a1a',
+    },
+    pillActive: {
+        backgroundColor: '#FF6B35',
+    },
+    pillText: {
+        color: '#888',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    pillTextActive: {
+        color: 'white',
     },
     storiesContainer: {
         paddingVertical: 12,
@@ -227,5 +378,88 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: '#262626',
+    },
+    // Pulse (Threads-like) styles
+    pulseContainer: {
+        flex: 1,
+    },
+    composeBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        gap: 12,
+    },
+    composeAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+    },
+    composePlaceholder: {
+        flex: 1,
+        color: '#666',
+        fontSize: 16,
+    },
+    composeBtn: {
+        backgroundColor: '#FF6B35',
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    pulsePost: {
+        flexDirection: 'row',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#262626',
+    },
+    pulseAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        marginRight: 12,
+    },
+    pulseContent: {
+        flex: 1,
+    },
+    pulseHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    pulseAuthor: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: 15,
+        marginRight: 4,
+    },
+    pulseHandle: {
+        color: '#666',
+        fontSize: 14,
+        marginRight: 4,
+    },
+    pulseTime: {
+        color: '#666',
+        fontSize: 14,
+    },
+    pulseText: {
+        color: 'white',
+        fontSize: 15,
+        lineHeight: 22,
+        marginBottom: 12,
+    },
+    pulseActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        maxWidth: 280,
+    },
+    pulseAction: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    pulseActionText: {
+        color: '#666',
+        fontSize: 13,
     },
 });

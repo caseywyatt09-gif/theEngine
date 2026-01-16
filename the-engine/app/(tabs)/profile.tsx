@@ -30,8 +30,97 @@ const MOCK_FUN_STATS = {
     highFives: 234,
 };
 
+// Mock Health Stats
+const MOCK_HEALTH_STATS = {
+    restingHR: 42,
+    hrv: 112,
+    sleepAvg: '7h 45m',
+    recoveryScore: 92,
+};
+
+// Mock Weekly Activity
+const MOCK_WEEKLY_ACTIVITY = [
+    { day: 'M', minutes: 45, strain: 'low' },
+    { day: 'T', minutes: 90, strain: 'high' },
+    { day: 'W', minutes: 60, strain: 'med' },
+    { day: 'T', minutes: 30, strain: 'low' },
+    { day: 'F', minutes: 120, strain: 'high' },
+    { day: 'S', minutes: 0, strain: 'rest' },
+    { day: 'S', minutes: 180, strain: 'high' },
+];
+
+// Mock Recent Activity
+const MOCK_RECENT_ACTIVITY_ITEMS = [
+    { id: 1, type: 'run', title: 'Morning 5K', subtitle: '23:45 · 5.02km', time: '2h ago', icon: 'walk' },
+    { id: 2, type: 'workout', title: 'Full Body Hyrox Prep', subtitle: '45m · 320 cal', time: 'Yesterday', icon: 'barbell' },
+    { id: 3, type: 'social', title: 'Group Run with @sarah_run', subtitle: 'Social Mode', time: '2d ago', icon: 'people' },
+];
+
 export default function ProfileScreen() {
     const { mode, toggleMode } = useAppStore();
+    const activeColor = mode === 'race' ? Colors.race : Colors.fun;
+
+    const renderHealthSnapshot = () => (
+        <View className="bg-surface rounded-2xl p-6 mb-4 border border-gray-800">
+            <Text className="text-lg font-bold text-white mb-4 flex-row items-center">
+                <Ionicons name="fitness" size={20} color={activeColor} /> Health Snapshot
+            </Text>
+            <View className="flex-row justify-between">
+                <View className="items-center">
+                    <Ionicons name="heart" size={24} color="#FF595E" />
+                    <Text className="text-white font-bold text-lg mt-1">{MOCK_HEALTH_STATS.restingHR}</Text>
+                    <Text className="text-textDim text-[10px] uppercase">RHR</Text>
+                </View>
+                <View className="items-center">
+                    <Ionicons name="pulse" size={24} color="#1982C4" />
+                    <Text className="text-white font-bold text-lg mt-1">{MOCK_HEALTH_STATS.hrv}</Text>
+                    <Text className="text-textDim text-[10px] uppercase">HRV</Text>
+                </View>
+                <View className="items-center">
+                    <Ionicons name="moon" size={24} color="#6A4C93" />
+                    <Text className="text-white font-bold text-lg mt-1">{MOCK_HEALTH_STATS.sleepAvg}</Text>
+                    <Text className="text-textDim text-[10px] uppercase">Sleep</Text>
+                </View>
+                <View className="items-center">
+                    <Ionicons name="battery-charging" size={24} color="#8AC926" />
+                    <Text className="text-white font-bold text-lg mt-1">{MOCK_HEALTH_STATS.recoveryScore}%</Text>
+                    <Text className="text-textDim text-[10px] uppercase">Recovery</Text>
+                </View>
+            </View>
+        </View>
+    );
+
+    const renderActivityGuide = () => (
+        <View className={`bg-surface rounded-2xl p-6 mb-4 border ${mode === 'race' ? 'border-race/30' : 'border-fun/30'}`}>
+            <Text className="text-lg font-bold text-white mb-4">
+                {mode === 'race' ? 'Weekly Workload' : 'Activity Streak'}
+            </Text>
+            <View className="flex-row items-end justify-between h-32 pb-2">
+                {MOCK_WEEKLY_ACTIVITY.map((day, idx) => {
+                    const heightPercent = Math.min((day.minutes / 180) * 100, 100);
+                    let barColor = '#333';
+                    if (day.strain === 'high') barColor = '#FF595E';
+                    if (day.strain === 'med') barColor = '#FFCA3A';
+                    if (day.strain === 'low') barColor = '#8AC926';
+                    if (day.strain === 'rest') barColor = '#1a1a1a';
+
+                    return (
+                        <View key={idx} className="items-center gap-2">
+                            <View
+                                style={{
+                                    width: 8,
+                                    height: `${Math.max(heightPercent, 5)}%`,
+                                    backgroundColor: barColor,
+                                    borderRadius: 4
+                                }}
+                            />
+                            <Text className="text-textDim text-xs">{day.day}</Text>
+                        </View>
+                    );
+                })}
+            </View>
+        </View>
+    );
 
     return (
         <ScrollView className="flex-1 bg-background" contentContainerStyle={{ paddingBottom: 100 }}>
@@ -58,6 +147,10 @@ export default function ProfileScreen() {
                     <Text className="text-textDim">{MOCK_USER.username}</Text>
                     <Text className="text-gray-400 mt-2 text-center px-8">{MOCK_USER.bio}</Text>
                 </View>
+
+                {renderHealthSnapshot()}
+
+                {renderActivityGuide()}
 
                 {/* Mode-Specific Stats */}
                 {mode === 'race' ? (
@@ -124,12 +217,24 @@ export default function ProfileScreen() {
                             </View>
                         </View>
 
-                        {/* Social Activity */}
+
+                        {/* Recent Activity */}
                         <View className="bg-surface rounded-2xl p-6 border border-gray-800">
                             <Text className="text-lg font-bold text-white mb-4">
                                 Recent Activity
                             </Text>
-                            <Text className="text-gray-400">Your latest social posts will appear here.</Text>
+                            {MOCK_RECENT_ACTIVITY_ITEMS.map((item, idx) => (
+                                <View key={item.id} className={`flex-row items-center gap-4 py-3 ${idx !== MOCK_RECENT_ACTIVITY_ITEMS.length - 1 ? 'border-b border-gray-800' : ''}`}>
+                                    <View className="w-10 h-10 rounded-full bg-surfaceHighlight items-center justify-center border border-gray-700">
+                                        <Ionicons name={item.icon as any} size={20} color={Colors.textDim} />
+                                    </View>
+                                    <View className="flex-1">
+                                        <Text className="text-white font-bold">{item.title}</Text>
+                                        <Text className="text-textDim text-xs">{item.subtitle}</Text>
+                                    </View>
+                                    <Text className="text-gray-500 text-xs">{item.time}</Text>
+                                </View>
+                            ))}
                         </View>
                     </>
                 )}

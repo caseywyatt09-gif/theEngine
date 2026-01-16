@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 
-// Replace with your Supabase project credentials
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
+// Credentials loaded from environment variables (app.json extra config)
+// See .env.example for required variables
+const SUPABASE_URL = Constants.expoConfig?.extra?.supabaseUrl || 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = Constants.expoConfig?.extra?.supabaseAnonKey || 'your-anon-key';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
