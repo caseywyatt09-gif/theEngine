@@ -1719,24 +1719,8 @@ export default function App() {
               <Text style={{ color: Colors.textDim, marginTop: 4 }}>Focus: {TRAINING_BLOCK.focus}</Text>
             </View>
 
-            {/* Benchmarks */}
-            <Text style={styles.sectionTitle}>📊 Benchmarks</Text>
-            <View style={{ backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginBottom: 20 }}>
-              {BENCHMARKS.map((bench, idx) => (
-                <View key={bench.id} style={{ marginBottom: idx === BENCHMARKS.length - 1 ? 0 : 16 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <Text style={{ color: 'white', fontWeight: '600' }}>{bench.label}</Text>
-                    <Text style={{ color: Colors.textDim, fontSize: 12 }}>Target: <Text style={{ color: 'white' }}>{bench.target}</Text></Text>
-                  </View>
-                  <View style={{ height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
-                    <View style={{ width: `${bench.progress * 100}%`, height: '100%', backgroundColor: idx === 0 ? Colors.active : idx === 1 ? Colors.race : Colors.fun }} />
-                  </View>
-                  <View style={{ alignItems: 'flex-end', marginTop: 4 }}>
-                    <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>{bench.current}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
+            {/* Benchmarks Moved to Dashboard */}
+
 
             {/* Battle Plan */}
             <Text style={styles.sectionTitle}>⚔️ Weekly Battle Plan</Text>
@@ -2375,40 +2359,51 @@ export default function App() {
       case 'profile':
         return (
           <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 100 }}>
-            {/* 1. Header Section */}
-            <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 24 }}>
-              <View style={styles.avatarCircle}>
-                <MaterialCommunityIcons name="account" size={60} color={Colors.textDim} />
-                <View style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  backgroundColor: selectedGoal === 'race' ? Colors.race : Colors.fun,
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 3,
-                  borderColor: Colors.background
-                }}>
-                  <MaterialCommunityIcons
-                    name={selectedGoal === 'race' ? "trophy-variant-outline" : "party-popper"}
-                    size={18}
-                    color="white"
-                  />
+            {/* 1. Dashboard Header */}
+            <View style={{ padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+              <View>
+                <Text style={styles.headerTitle}>My Dashboard</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ADE80' }} />
+                  <Text style={{ color: '#4ADE80', fontSize: 12, fontWeight: '700' }}>Online</Text>
                 </View>
               </View>
-              <Text style={styles.profileName}>Guest Athlete</Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                  <MaterialCommunityIcons name={selectedGender === 'male' ? "gender-male" : selectedGender === 'female' ? "gender-female" : "gender-male-female"} size={14} color={Colors.textDim} />
-                  <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>{selectedGender ? selectedGender.charAt(0).toUpperCase() + selectedGender.slice(1) : 'Not Set'}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}>
-                  <Ionicons name="location-outline" size={14} color={Colors.textDim} />
-                  <Text style={{ color: Colors.textDim, fontSize: 13, marginLeft: 4 }}>New York, NY</Text>
-                </View>
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                {/* View Public Card Button */}
+                <TouchableOpacity
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
+                  onPress={() => {
+                    SoundEffects.playTap();
+                    alert("👀 PREVIEW: This modal shows your PUBLIC card as seen in the Match feed.");
+                  }}
+                >
+                  <Ionicons name="eye-outline" size={20} color="white" />
+                </TouchableOpacity>
+
+                {/* Share Button (New) */}
+                <TouchableOpacity
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
+                  onPress={() => {
+                    SoundEffects.playSuccess();
+                    alert("🚀 SHARE: Generating story image... (Sent to IG/TikTok)");
+                  }}
+                >
+                  <Ionicons name="share-social-outline" size={20} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ backgroundColor: 'rgba(255,255,255,0.1)', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="settings-outline" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Compact Profile Summary */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginBottom: 24, gap: 16 }}>
+              <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: selectedGoal === 'race' ? Colors.race : Colors.fun }}>
+                <MaterialCommunityIcons name="account" size={32} color={Colors.textDim} />
+              </View>
+              <View>
+                <Text style={{ color: 'white', fontWeight: '700', fontSize: 18 }}>Guest Athlete</Text>
+                <Text style={{ color: Colors.textDim, fontSize: 12 }}>New York, NY</Text>
               </View>
             </View>
 
@@ -2480,6 +2475,27 @@ export default function App() {
               <View style={{ alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>88</Text>
                 <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Followers</Text>
+              </View>
+            </View>
+
+            {/* NEW: Benchmarks (Moved from War Room) */}
+            <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
+              <Text style={styles.sectionTitle}>📊 Progress Benchmarks</Text>
+              <View style={{ backgroundColor: Colors.surface, borderRadius: 16, padding: 16 }}>
+                {BENCHMARKS.map((bench, idx) => (
+                  <View key={bench.id} style={{ marginBottom: idx === BENCHMARKS.length - 1 ? 0 : 16 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <Text style={{ color: 'white', fontWeight: '600' }}>{bench.label}</Text>
+                      <Text style={{ color: Colors.textDim, fontSize: 12 }}>Target: <Text style={{ color: 'white' }}>{bench.target}</Text></Text>
+                    </View>
+                    <View style={{ height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
+                      <View style={{ width: `${bench.progress * 100}%`, height: '100%', backgroundColor: idx === 0 ? Colors.active : idx === 1 ? Colors.race : Colors.fun }} />
+                    </View>
+                    <View style={{ alignItems: 'flex-end', marginTop: 4 }}>
+                      <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>{bench.current}</Text>
+                    </View>
+                  </View>
+                ))}
               </View>
             </View>
 
