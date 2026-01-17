@@ -437,6 +437,24 @@ export default function App() {
     { id: 'streak', icon: 'fire', label: 'On Fire', color: '#FF8C00', description: '3-Day Streak' },
     { id: 'social', icon: 'account-group', label: 'Social', color: '#2ED573', description: 'Event Regular' }
   ];
+
+  // War Room Data
+  const UPCOMING_RACE = { name: 'HYROX Chicago', date: '2026-11-18', daysLeft: 18 };
+  const TRAINING_BLOCK = { name: 'Strength Phase', week: 4, totalWeeks: 8, focus: 'Sleds & Lunges' };
+
+  const BENCHMARKS = [
+    { id: 'ski', label: 'SkiErg', current: '3:45', target: '3:30', progress: 0.8 },
+    { id: 'sled_push', label: 'Sled Push', current: '145kg', target: '152kg', progress: 0.9 },
+    { id: 'run', label: 'Run Split', current: '4:45/km', target: '4:30/km', progress: 0.7 },
+  ];
+
+  const [battlePlan, setBattlePlan] = useState([
+    { id: '1', title: 'Heavy Sled Pulls', completed: true, day: 'Mon' },
+    { id: '2', title: 'Zone 2 Run (45min)', completed: true, day: 'Tue' },
+    { id: '3', title: 'Wall Ball Intervals', completed: false, day: 'Wed' },
+    { id: '4', title: 'Rest & Mobility', completed: false, day: 'Thu' },
+    { id: '5', title: 'Full Sim (50%)', completed: false, day: 'Fri' },
+  ]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedMode, setFeedMode] = useState<'photos' | 'pulse' | 'forum'>('photos');
 
@@ -1673,13 +1691,75 @@ export default function App() {
         );
       case 'warroom':
         return (
-          <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16 }}>
-            <Text style={styles.sectionTitle}>🏋️ Training Dashboard</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}><Text style={styles.statValue}>12</Text><Text style={styles.statLabel}>Workouts</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>48km</Text><Text style={styles.statLabel}>Distance</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>5:12</Text><Text style={styles.statLabel}>Avg Pace</Text></View>
-              <View style={styles.statCard}><Text style={styles.statValue}>85</Text><Text style={styles.statLabel}>Score</Text></View>
+          <ScrollView style={styles.scrollContent} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+            {/* Header: Countdown & Readiness */}
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
+              <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 16, padding: 16, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: Colors.textDim, fontSize: 12, textTransform: 'uppercase', fontWeight: '700' }}>Next Race</Text>
+                <Text style={{ color: Colors.active, fontSize: 32, fontWeight: '800' }}>{UPCOMING_RACE.daysLeft}</Text>
+                <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>Days To Go</Text>
+                <Text style={{ color: Colors.textDim, fontSize: 10, marginTop: 4 }}>{UPCOMING_RACE.name}</Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 16, padding: 16, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: Colors.textDim, fontSize: 12, textTransform: 'uppercase', fontWeight: '700' }}>Readiness</Text>
+                <View style={{ width: 60, height: 60, borderRadius: 30, borderWidth: 4, borderColor: '#4ADE80', alignItems: 'center', justifyContent: 'center', marginVertical: 8 }}>
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '800' }}>85%</Text>
+                </View>
+                <Text style={{ color: '#4ADE80', fontSize: 12, fontWeight: '600' }}>Peaking 📈</Text>
+              </View>
+            </View>
+
+            {/* Current Block */}
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 16, marginBottom: 20, borderLeftWidth: 4, borderLeftColor: Colors.accent }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={{ color: Colors.accent, fontWeight: '700', textTransform: 'uppercase', fontSize: 12 }}>Current Block</Text>
+                <Text style={{ color: 'white', fontWeight: '700' }}>Week {TRAINING_BLOCK.week} / {TRAINING_BLOCK.totalWeeks}</Text>
+              </View>
+              <Text style={{ color: 'white', fontSize: 20, fontWeight: '700' }}>{TRAINING_BLOCK.name}</Text>
+              <Text style={{ color: Colors.textDim, marginTop: 4 }}>Focus: {TRAINING_BLOCK.focus}</Text>
+            </View>
+
+            {/* Benchmarks */}
+            <Text style={styles.sectionTitle}>📊 Benchmarks</Text>
+            <View style={{ backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginBottom: 20 }}>
+              {BENCHMARKS.map((bench, idx) => (
+                <View key={bench.id} style={{ marginBottom: idx === BENCHMARKS.length - 1 ? 0 : 16 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ color: 'white', fontWeight: '600' }}>{bench.label}</Text>
+                    <Text style={{ color: Colors.textDim, fontSize: 12 }}>Target: <Text style={{ color: 'white' }}>{bench.target}</Text></Text>
+                  </View>
+                  <View style={{ height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, overflow: 'hidden' }}>
+                    <View style={{ width: `${bench.progress * 100}%`, height: '100%', backgroundColor: idx === 0 ? Colors.active : idx === 1 ? Colors.race : Colors.fun }} />
+                  </View>
+                  <View style={{ alignItems: 'flex-end', marginTop: 4 }}>
+                    <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>{bench.current}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Battle Plan */}
+            <Text style={styles.sectionTitle}>⚔️ Weekly Battle Plan</Text>
+            <View style={{ gap: 10 }}>
+              {battlePlan.map(mission => (
+                <View key={mission.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, padding: 16, borderRadius: 12 }}>
+                  <TouchableOpacity
+                    style={{ width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: mission.completed ? '#4ADE80' : Colors.textDim, backgroundColor: mission.completed ? 'rgba(74, 222, 128, 0.2)' : 'transparent', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}
+                    onPress={() => {
+                      SoundEffects.playTap();
+                      setBattlePlan(prev => prev.map(p => p.id === mission.id ? { ...p, completed: !p.completed } : p));
+                    }}
+                  >
+                    {mission.completed && <Ionicons name="checkmark" size={16} color="#4ADE80" />}
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: mission.completed ? Colors.textDim : 'white', fontWeight: '600', textDecorationLine: mission.completed ? 'line-through' : 'none' }}>{mission.title}</Text>
+                  </View>
+                  <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                    <Text style={{ color: Colors.textDim, fontSize: 10, fontWeight: '700' }}>{mission.day}</Text>
+                  </View>
+                </View>
+              ))}
             </View>
           </ScrollView>
         );
