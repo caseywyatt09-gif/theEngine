@@ -1788,6 +1788,17 @@ export default function App() {
                           </View>
                           <Text style={{ color: Colors.textDim, fontSize: 10, alignSelf: 'center' }}>{workout.duration}</Text>
                         </View>
+                        {/* Visual Interval Bars simulation */}
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 16 }}>
+                          {[...Array(8)].map((_, i) => (
+                            <View key={i} style={{
+                              width: 3,
+                              height: Math.random() > 0.5 ? 16 : 8,
+                              backgroundColor: 'rgba(255,255,255,0.3)',
+                              borderRadius: 1
+                            }} />
+                          ))}
+                        </View>
                       </View>
                       <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 4 }}>{workout.title}</Text>
                       <Text style={{ color: Colors.textDim, fontSize: 12, lineHeight: 16 }}>{workout.description}</Text>
@@ -2469,6 +2480,38 @@ export default function App() {
               <View style={{ alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>88</Text>
                 <Text style={{ fontSize: 12, color: Colors.textDim, marginTop: 4 }}>Followers</Text>
+              </View>
+            </View>
+
+            {/* 2.5 Personal Records (COROS Style) */}
+            <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <Text style={styles.sectionTitle}>🥇 Personal Records</Text>
+                <TouchableOpacity>
+                  <MaterialCommunityIcons name="history" size={20} color={Colors.textDim} />
+                </TouchableOpacity>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 12, padding: 12 }}>
+                  <MaterialCommunityIcons name="run" size={20} color="#EAB308" style={{ marginBottom: 8 }} />
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>19:42</Text>
+                  <Text style={{ color: Colors.textDim, fontSize: 10 }}>5km Run</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 12, padding: 12 }}>
+                  <MaterialCommunityIcons name="ski" size={20} color="#3B82F6" style={{ marginBottom: 8 }} />
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>3:58</Text>
+                  <Text style={{ color: Colors.textDim, fontSize: 10 }}>1km Ski</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 12, padding: 12 }}>
+                  <MaterialCommunityIcons name="arrow-right-bold" size={20} color="#EF4444" style={{ marginBottom: 8 }} />
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>152kg</Text>
+                  <Text style={{ color: Colors.textDim, fontSize: 10 }}>Sled Push</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: Colors.surface, borderRadius: 12, padding: 12 }}>
+                  <MaterialCommunityIcons name="weight-lifter" size={20} color="#A855F7" style={{ marginBottom: 8 }} />
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>415</Text>
+                  <Text style={{ color: Colors.textDim, fontSize: 10 }}>Total Reps</Text>
+                </View>
               </View>
             </View>
 
