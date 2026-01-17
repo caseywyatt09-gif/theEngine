@@ -1761,6 +1761,47 @@ export default function App() {
                 </View>
               ))}
             </View>
+
+            {/* Targeted Sessions (Adaptive) */}
+            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>🎯 Targeted Sessions</Text>
+            {/* Logic: Show workouts based on Weaknesses first, then Strengths */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
+              {HYROX_WORKOUT_LIBRARY.filter(w => selectedHyroxWeaknesses.includes(w.stationId) || selectedHyroxStrengths.includes(w.stationId)).length > 0 ? (
+                HYROX_WORKOUT_LIBRARY
+                  .filter(w => selectedHyroxWeaknesses.includes(w.stationId) || selectedHyroxStrengths.includes(w.stationId))
+                  .sort((a, b) => {
+                    // Prioritize weaknesses
+                    const aIsWeakness = selectedHyroxWeaknesses.includes(a.stationId);
+                    const bIsWeakness = selectedHyroxWeaknesses.includes(b.stationId);
+                    if (aIsWeakness && !bIsWeakness) return -1;
+                    if (!aIsWeakness && bIsWeakness) return 1;
+                    return 0;
+                  })
+                  .map(workout => (
+                    <View key={workout.id} style={{ width: 200, backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginRight: 4 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <View style={{ flexDirection: 'row', gap: 6 }}>
+                          <View style={{ backgroundColor: selectedHyroxWeaknesses.includes(workout.stationId) ? 'rgba(255, 71, 87, 0.2)' : 'rgba(74, 222, 128, 0.2)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                            <Text style={{ color: selectedHyroxWeaknesses.includes(workout.stationId) ? '#FF4757' : '#4ADE80', fontSize: 10, fontWeight: '700' }}>
+                              {selectedHyroxWeaknesses.includes(workout.stationId) ? 'IMPROVE' : 'SHARPEN'}
+                            </Text>
+                          </View>
+                          <Text style={{ color: Colors.textDim, fontSize: 10, alignSelf: 'center' }}>{workout.duration}</Text>
+                        </View>
+                      </View>
+                      <Text style={{ color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 4 }}>{workout.title}</Text>
+                      <Text style={{ color: Colors.textDim, fontSize: 12, lineHeight: 16 }}>{workout.description}</Text>
+                      <TouchableOpacity style={{ marginTop: 12, backgroundColor: 'rgba(255,255,255,0.1)', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }} onPress={() => SoundEffects.playTap()}>
+                        <Text style={{ color: 'white', fontSize: 12, fontWeight: '700' }}>Start Session</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))
+              ) : (
+                <View style={{ width: '100%', padding: 20, alignItems: 'center' }}>
+                  <Text style={{ color: Colors.textDim, fontStyle: 'italic' }}>Complete your profile to see targeted workouts.</Text>
+                </View>
+              )}
+            </ScrollView>
           </ScrollView>
         );
 
