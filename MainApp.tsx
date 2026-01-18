@@ -6,6 +6,8 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -185,15 +187,8 @@ const MARKET_IMAGES = {
   live2: require('./assets/images/market_live_2.png'),
 };
 
-// Inline colors to avoid import issues
-const Colors = {
-  background: '#0A0A0F',
-  surface: '#1A1A23',
-  primary: '#FF4500',
-  race: '#FF4500',
-  fun: '#00CED1',
-  textDim: '#888888',
-};
+// Colors imported from constants
+import { Colors } from './constants/Colors';
 
 type TabName = 'feed' | 'social' | 'warroom' | 'market' | 'profile';
 type AppMode = 'race' | 'fun';
@@ -401,6 +396,23 @@ export default function App() {
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>(['founder']);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]); // New Vibe State
+  const [showPublicCard, setShowPublicCard] = useState(false); // Public Card Preview State
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    // Request permission implicitly on launch
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      SoundEffects.playSuccess();
+    }
+  };
 
   // Vibe Data
   const VIBES = [
@@ -455,6 +467,17 @@ export default function App() {
     { id: '4', title: 'Rest & Mobility', completed: false, day: 'Thu' },
     { id: '5', title: 'Full Sim (50%)', completed: false, day: 'Fri' },
   ]);
+
+  // Hyrox Workout Library for Adaptive Recommendations
+  const HYROX_WORKOUT_LIBRARY = [
+    { id: 'w1', stationId: 'sled_push', title: 'Leg Drive Power', description: 'Heavy sled push intervals: 4x25m @ 150kg. Rest 2min.', duration: '30 min', type: 'Strength' },
+    { id: 'w2', stationId: 'skierg', title: 'Ski Capacity', description: '500m / 400m / 300m / 200m / 100m descending ladder. 1:1 Rest.', duration: '25 min', type: 'Endurance' },
+    { id: 'w3', stationId: 'run', title: 'Threshold Intervals', description: '3x1km Run @ race pace. 90s rest.', duration: '40 min', type: 'Running' },
+    { id: 'w4', stationId: 'wall_balls', title: 'Karen on Steroids', description: '150 Wall Balls for time. Every time you break, 5 burpees.', duration: '15 min', type: 'High Intensity' },
+    { id: 'w5', stationId: 'row', title: 'Rowing Power', description: '10x250m Row sprints. Rest 90s.', duration: '35 min', type: 'Power' },
+    { id: 'w6', stationId: 'sandbag_lunges', title: 'Glute Destroyer', description: '400m Sandbag Walking Lunges. Partition as needed.', duration: '45 min', type: 'Strength' },
+    { id: 'w7', stationId: 'burpee_broad_jump', title: 'Explosive Hips', description: '10 rounds: 25m Burpee Broad Jumps. Rest 60s.', duration: '30 min', type: 'Endurance' }
+  ];
   const [isLoading, setIsLoading] = useState(true);
   const [feedMode, setFeedMode] = useState<'photos' | 'pulse' | 'forum'>('photos');
 
@@ -480,6 +503,92 @@ export default function App() {
   const [selectedGender, setSelectedGender] = useState<'male' | 'female' | 'other' | null>(null);
   const [selectedHyroxStrengths, setSelectedHyroxStrengths] = useState<string[]>([]);
   const [selectedHyroxWeaknesses, setSelectedHyroxWeaknesses] = useState<string[]>([]);
+
+  // --- PERSISTENCE LOGIC START ---
+  const STORAGE_KEYS = {
+    ONBOARDING: 'onboarding_v1',
+    PROFILE: 'profile_v1',
+    BADGES: 'badges_v1',
+  };
+
+  // Load Data on Mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load Onboarding
+        const onboardingData = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING);
+        if (onboardingData) {
+          const { showOnboarding: savedShow, onboardingStep: savedStep } = JSON.parse(onboardingData);
+          setShowOnboarding(savedShow);
+          setOnboardingStep(savedStep);
+        }
+
+        // Load Profile
+        const profileData = await AsyncStorage.getItem(STORAGE_KEYS.PROFILE);
+        if (profileData) {
+          const { goal, vibes, gender, image, strengths, weaknesses } = JSON.parse(profileData);
+          if (goal) setSelectedGoal(goal);
+          if (vibes) setSelectedVibes(vibes);
+          if (gender) setSelectedGender(gender);
+          if (image) setProfileImage(image);
+          if (strengths) setSelectedHyroxStrengths(strengths);
+          if (weaknesses) setSelectedHyroxWeaknesses(weaknesses);
+        }
+
+        // Load Badges
+        const badgesData = await AsyncStorage.getItem(STORAGE_KEYS.BADGES);
+        if (badgesData) {
+          setUnlockedBadges(JSON.parse(badgesData));
+        }
+
+      } catch (e) {
+        console.error('Failed to load persistence data', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // Save Onboarding
+  useEffect(() => {
+    const saveOnboarding = async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING, JSON.stringify({ showOnboarding, onboardingStep }));
+      } catch (e) { console.error('Failed to save onboarding', e); }
+    };
+    saveOnboarding();
+  }, [showOnboarding, onboardingStep]);
+
+  // Save Profile
+  useEffect(() => {
+    const saveProfile = async () => {
+      try {
+        const profileData = {
+          goal: selectedGoal,
+          vibes: selectedVibes,
+          gender: selectedGender,
+          image: profileImage,
+          strengths: selectedHyroxStrengths,
+          weaknesses: selectedHyroxWeaknesses
+        };
+        await AsyncStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profileData));
+      } catch (e) { console.error('Failed to save profile', e); }
+    };
+    // Debounce slightly in real app, but direct save is fine for now
+    if (!isLoading) saveProfile();
+  }, [selectedGoal, selectedVibes, selectedGender, profileImage, selectedHyroxStrengths, selectedHyroxWeaknesses]);
+
+  // Save Badges
+  useEffect(() => {
+    const saveBadges = async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(unlockedBadges));
+      } catch (e) { console.error('Failed to save badges', e); }
+    };
+    if (!isLoading) saveBadges();
+  }, [unlockedBadges]);
+  // --- PERSISTENCE LOGIC END ---
   const [findingMatch, setFindingMatch] = useState(false);
   const [matchFound, setMatchFound] = useState(false);
   const [searchText, setSearchText] = useState('Scanning nearby athletes...');
@@ -1610,7 +1719,7 @@ export default function App() {
                         </View>
 
                         {/* Action Buttons Overlay */}
-                        <View style={{ position: 'absolute', bottom: 20, right: 20, flexDirection: 'row', gap: 16 }}>
+                        <View style={{ position: 'absolute', bottom: 16, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 16 }}>
                           <TouchableOpacity style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: Colors.race }} onPress={() => { SoundEffects.playTap(); setCurrentIndex(currentIndex + 1); }}>
                             <Ionicons name="close" size={24} color={Colors.race} />
                           </TouchableOpacity>
@@ -2374,7 +2483,7 @@ export default function App() {
                   style={{ backgroundColor: 'rgba(255,255,255,0.1)', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
                   onPress={() => {
                     SoundEffects.playTap();
-                    alert("👀 PREVIEW: This modal shows your PUBLIC card as seen in the Match feed.");
+                    setShowPublicCard(true);
                   }}
                 >
                   <Ionicons name="eye-outline" size={20} color="white" />
@@ -2385,7 +2494,8 @@ export default function App() {
                   style={{ backgroundColor: 'rgba(255,255,255,0.1)', width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
                   onPress={() => {
                     SoundEffects.playSuccess();
-                    alert("🚀 SHARE: Generating story image... (Sent to IG/TikTok)");
+                    setShowPublicCard(true);
+                    // In a real app, this would auto-trigger the share sheet
                   }}
                 >
                   <Ionicons name="share-social-outline" size={20} color="white" />
@@ -2398,9 +2508,19 @@ export default function App() {
 
             {/* Compact Profile Summary */}
             <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginBottom: 24, gap: 16 }}>
-              <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: selectedGoal === 'race' ? Colors.race : Colors.fun }}>
-                <MaterialCommunityIcons name="account" size={32} color={Colors.textDim} />
-              </View>
+              <TouchableOpacity onPress={() => { SoundEffects.playTap(); pickImage(); }}>
+                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: selectedGoal === 'race' ? Colors.race : Colors.fun, overflow: 'hidden' }}>
+                  {profileImage ? (
+                    <Image source={{ uri: profileImage }} style={{ width: '100%', height: '100%' }} />
+                  ) : (
+                    <MaterialCommunityIcons name="account" size={32} color={Colors.textDim} />
+                  )}
+                </View>
+                {/* Edit Icon Overlay */}
+                <View style={{ position: 'absolute', bottom: 0, right: -4, backgroundColor: Colors.surface, borderRadius: 10, padding: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <Ionicons name="camera" size={12} color="white" />
+                </View>
+              </TouchableOpacity>
               <View>
                 <Text style={{ color: 'white', fontWeight: '700', fontSize: 18 }}>Guest Athlete</Text>
                 <Text style={{ color: Colors.textDim, fontSize: 12 }}>New York, NY</Text>
@@ -2702,6 +2822,100 @@ export default function App() {
           </SafeAreaView>
         </View>
       )}
+
+      {/* PUBLIC CARD PREVIEW MODAL */}
+      <Modal visible={showPublicCard} animationType="slide" transparent>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <SafeAreaView style={{ flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'flex-end', paddingBottom: 20 }}>
+              <TouchableOpacity onPress={() => setShowPublicCard(false)} style={{ padding: 10 }}>
+                <Ionicons name="close-circle" size={40} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            {/* CARD PREVIEW */}
+            <View style={{
+              width: '100%',
+              maxWidth: 400,
+              aspectRatio: 0.65,
+              borderRadius: 24,
+              overflow: 'hidden',
+              backgroundColor: Colors.surface,
+              borderWidth: 2,
+              borderColor: selectedGoal === 'race' ? Colors.race : Colors.fun,
+            }}>
+              {/* 1. Image & Overlay (Placeholder or Asset) */}
+              <View style={{ width: '100%', height: '100%', backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+                {profileImage ? (
+                  <Image source={{ uri: profileImage }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                ) : (
+                  <MaterialCommunityIcons name="account" size={150} color={Colors.textDim} />
+                )}
+              </View>
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.4)', 'black']} style={StyleSheet.absoluteFillObject} />
+
+              {/* 2. Badge (Top Right) */}
+              <View style={{ position: 'absolute', top: 20, right: 20, backgroundColor: selectedGoal === 'race' ? Colors.race : Colors.fun, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontWeight: '800', fontSize: 12 }}>
+                  {selectedGoal === 'race' ? '🏁 RACE MODE' : '🎉 FUN MODE'}
+                </Text>
+              </View>
+
+              {/* 3. Content (Bottom) */}
+              <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 24 }}>
+                {/* Name & Loc */}
+                <Text style={{ color: 'white', fontSize: 32, fontWeight: '800', marginBottom: 4 }}>Guest Athlete</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                  <Ionicons name="location" size={16} color={Colors.textDim} />
+                  <Text style={{ color: Colors.textDim, fontSize: 16, marginLeft: 4 }}>New York, NY</Text>
+                </View>
+
+                {/* Tags */}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                  {selectedVibes.slice(0, 3).map(v => (
+                    <View key={v} style={{ backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                      <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>{VIBES.find(vb => vb.id === v)?.label || v}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Strengths */}
+                {selectedHyroxStrengths.length > 0 && (
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    {selectedHyroxStrengths.slice(0, 3).map(s => (
+                      <View key={s} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: Colors.active, alignItems: 'center', justifyContent: 'center' }}>
+                        <MaterialCommunityIcons name={HYROX_STATIONS.find(h => h.id === s)?.icon as any} size={18} color="black" />
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* ACTION BUTTONS */}
+            <TouchableOpacity
+              style={{
+                marginTop: 30,
+                backgroundColor: '#E1306C', // Instagram Gradient-ish
+                paddingHorizontal: 32,
+                paddingVertical: 16,
+                borderRadius: 30,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8
+              }}
+              onPress={() => {
+                SoundEffects.playCelebration();
+                alert("📸 SNAPSHOT SAVED! (Opening Instagram Stories...)");
+              }}
+            >
+              <Ionicons name="logo-instagram" size={24} color="white" />
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Share to Stories</Text>
+            </TouchableOpacity>
+
+          </SafeAreaView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -2813,7 +3027,7 @@ const styles = StyleSheet.create({
   cardGradient: { ...StyleSheet.absoluteFillObject },
   modeBadge: { position: 'absolute', top: 16, right: 16, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   modeBadgeText: { fontSize: 12, fontWeight: '700', color: 'white' },
-  cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 },
+  cardContent: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 90 },
   athleteName: { fontSize: 28, fontWeight: '800', color: 'white' },
   locationText: { fontSize: 14, color: Colors.textDim, marginTop: 4 },
   bioText: { fontSize: 15, color: 'rgba(255,255,255,0.8)', marginTop: 8 },

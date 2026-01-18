@@ -1,8 +1,17 @@
 export const Colors = {
-    background: '#121212',
-    primary: '#FDE047',
-    success: '#22C55E',
-    surface: '#1E1E1E',
+    background: '#0A0A0F',
+    surface: '#1A1A23',
+    primary: '#FF4500',
+    race: '#FF4500',
+    fun: '#00CED1',
+    active: '#FF4500',
+    accent: '#00CED1',
+    textDim: '#888888',
     text: '#FFFFFF',
-    textDim: '#AAAAAA',
+    success: '#22C55E',
+    white: '#FFFFFF',
+    gray: {
+        600: '#4B5563',
+        800: '#1F2937',
+    }
 };
